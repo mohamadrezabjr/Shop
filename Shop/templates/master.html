@@ -7,6 +7,8 @@
   {% load bootstrap5 %}
   {% bootstrap_css %}
   {% bootstrap_javascript %}
+
+{% block style %}
      <style>
         .card {
             border-radius: 15px;
@@ -43,7 +45,88 @@
         .container .row.g-4 {
             justify-content: center;
         }
+                .product-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+        }
+
+        .product-details {
+            padding: 2rem;
+        }
+
+        .product-details h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-details p {
+            font-size: 1.2rem;
+            color: #555;
+        }
+
+        .product-price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .btn-purchase {
+            margin-top: 1.5rem;
+        }
+
+        .collapse-details {
+            display: none;
+            transition: max-height 0.5s ease-out;
+        }
+
+        .collapse-details.show {
+            display: block;
+        }
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-container h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .login-container .form-control {
+            margin-bottom: 1rem;
+        }
+
+        .login-container .btn-primary {
+            width: 100%;
+        }
+
+        .login-container .form-text {
+            text-align: center;
+        }
+
+        .login-container .form-text a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .login-container .form-text a:hover {
+            text-decoration: underline;
+        }
+        . login-body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
     </style>
+{% endblock %}
 </head>
 <body>
 {% block content %}

@@ -14,7 +14,7 @@ index page
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Finance Hub</a>
+            <a class="navbar-brand" href="#">Welcome Dear {{ user.username }} !</a>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
@@ -23,6 +23,16 @@ index page
                     <li class="nav-item">
                         <a class="nav-link" >Register</a>
                     </li>
+                    {% if  log  %}
+                        <li class="nav-item">
+                        <a href = '/logout' class="nav-link" >Logout</a>
+                        </li>
+                    {% else  %}
+                        <li class="nav-item">
+                        <a href = '/login' class="nav-link" >Login</a>
+                        </li>
+                    {% endif %}
+
                     <li class="nav-item">
                         <a class="nav-link" href="https://github.com/mohamadrezabjr">Contact</a>
                     </li>
@@ -42,10 +52,11 @@ index page
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="card h-100 text-center">
+                    <a href="/products" class="text-decoration-none">
                     <div class="card-body">
-                        <h3 class="card-title">Products</h3>
+                         <h3 class="card-title">Products</h3>
                         <p class="card-text">See our exciting products!</p>
-                    </div>
+                    </div></a>
                 </div>
             </div>
         </div>

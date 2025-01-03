@@ -16,7 +16,7 @@ Products
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" >Home</a>
+                        <a href = '{% url 'index' %}'class="nav-link" >Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" >Register</a>
@@ -41,12 +41,12 @@ Products
             {% for product in products %}
             <div class="col-md-4">
                 <div class="card h-100 text-center">
-{#                    <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">#}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
                     <div class="card-body">
                         <h3 class="card-title">{{ product.name }}</h3>
                         <p class="card-text">{{ product.description }}</p>
                         <p class="fw-bold text-primary">${{ product.price }}</p>
-                        <a href="/purchase/{{ product.id }}/" class="btn btn-primary">Buy Now</a>
+                        <a href="products/purchase/{{ product.id }}" class="btn btn-primary">Details</a>
                     </div>
                 </div>
             </div>
