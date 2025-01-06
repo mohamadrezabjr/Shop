@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-
+{% load static %}
 {% block title %}
 index page
 {% endblock %}
@@ -17,9 +17,7 @@ index page
             <a class="navbar-brand" href="#">Welcome Dear {{ user.username }} !</a>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link">Home</a>
-                    </li>
+
                     <li class="nav-item">
                         <a class="nav-link" >Register</a>
                     </li>
@@ -37,6 +35,16 @@ index page
                         <a class="nav-link" href="https://github.com/mohamadrezabjr">Contact</a>
                     </li>
                 </ul>
+            {% if log %}
+            <a class="nav-link" href =  '{% url 'index' %}'>
+                <div class="cart-container">
+                    <i class="bi bi-cart cart-icon"></i>
+                    <img src = "{% static 'images/cart.png' %}" alt="Cart" class="cart-icon">
+                    <span class="cart-count"> {{ n }}
+                    </span>
+                </div>
+                </a>
+            {% endif %}
             </div>
         </div>
     </nav>
