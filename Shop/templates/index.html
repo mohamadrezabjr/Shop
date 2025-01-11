@@ -38,10 +38,12 @@ index page
             {% if log %}
             <a class="nav-link" href =  '{% url 'index' %}'>
                 <div class="cart-container">
+                    <a href = '{% url 'cart' %}' style="text-decoration: none">
                     <i class="bi bi-cart cart-icon"></i>
                     <img src = "{% static 'images/cart.png' %}" alt="Cart" class="cart-icon">
                     <span class="cart-count"> {{ n }}
                     </span>
+                    </a>
                 </div>
                 </a>
             {% endif %}
@@ -65,30 +67,6 @@ index page
                          <h3 class="card-title">Products</h3>
                         <p class="card-text">See our exciting products!</p>
                     </div></a>
-                </div>
-            </div>
-        </div>
-    </section>
-    <section class="container py-5">
-            <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100 text-center">
-                    <a  class="text-decoration-none">
-                        <div class="card-body">
-                            <h3 class="card-title">Register Section</h3>
-                            <p class="card-text">If you don't have a Token, you should first register.</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100 text-center">
-                    <a  class="text-decoration-none">
-                        <div class="card-body">
-                            <h3 class="card-title">Management Section</h3>
-                            <p class="card-text">Manage your income and expenses.</p>
-                        </div>
-                    </a>
                 </div>
             </div>
         </div>

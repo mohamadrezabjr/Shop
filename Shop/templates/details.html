@@ -30,14 +30,14 @@ Details
                     </li>
                 </ul>
                 {% if log %}
-                <a class="nav-link" href =  '{% url 'index' %}'>
                 <div class="cart-container">
+                    <a href = '{% url 'cart' %}' style="text-decoration: none">
                     <i class="bi bi-cart cart-icon"></i>
                     <img src = "{% static 'images/cart.png' %}" alt="Cart" class="cart-icon">
                     <span class="cart-count"> {{ n }}
                     </span>
+                    </a>
                 </div>
-                </a>
                 {% endif %}
                 </div>
                 </a>

@@ -8,7 +8,7 @@
   {% bootstrap_css %}
   {% bootstrap_javascript %}
 
-{% block style %}
+
      <style>
         .card {
             border-radius: 15px;
@@ -150,8 +150,54 @@
         .navbar {
             margin-bottom: 1rem;
         }
+            .register-container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 30px;
+      background-color: #f8f9fa;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+        .register-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .register-container h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .register-container .form-control {
+            margin-bottom: 1rem;
+        }
+
+        .register-container .btn-success {
+            width: 100%;
+        }
+
+        .register-container .form-text {
+            text-align: center;
+        }
+
+        .register-container .form-text a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .register-container .form-text a:hover {
+            text-decoration: underline;
+        }
+        {% block style %}
+    {% endblock %}
     </style>
-{% endblock %}
+
 </head>
 <body>
 {% block content %}

@@ -1,14 +1,31 @@
 from tempfile import template
 from django.shortcuts import render
 from django.contrib.auth.models import auth
-from django.contrib.auth import authenticate , logout
+from django.contrib.auth import authenticate , logout ,login
 from django.shortcuts import render , redirect
 from .models import *
 from django.http import HttpResponse
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
+from .forms import *
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
+def register(request):
+    form = RegisterForm()
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username= form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            return redirect('index')
+        else:
+            return redirect('register')
+    return render (request , 'registration/register.html',{'form':form})
 def logout_view(request):
     logout(request)
     return redirect('/')
@@ -24,8 +41,8 @@ def index(request):
             n += x.num
 
 
-
-    context = {'log':log ,'user':request.user, 'n':n}
+    category = Category.objects.all()
+    context = {'log':log ,'user':request.user, 'n':n, "category":category}
     return render(request, 'index.html', context)
 
 def product(request):
@@ -42,9 +59,9 @@ def product(request):
     context = {'products': products , 'n':n , 'log':log}
     return render (request, 'products.html', context=context)
 
-def details(request , id):
+def details(request , slug):
     log = False
-    this_product = Product.objects.get(id=id)
+    this_product = Product.objects.get(slug=slug)
 
     n = 0
     if request.user.is_authenticated:
@@ -58,10 +75,10 @@ def details(request , id):
 
     return render(request , "details.html", context=context)
 
-def add_cart(request,id):
+def add_cart(request,slug):
 
     if request.user.is_authenticated:
-        this_product = Product.objects.get(id=id)
+        this_product = Product.objects.get(slug=slug)
         in_cart = Cart.objects.filter(product = this_product , user = request.user)
 
         if in_cart.exists():
@@ -89,6 +106,11 @@ def cart(request):
 
         context = {'cart':cart , 'all':all_total, 'lst':lst , 'len':len_lst}
         return render(request, 'cart.html', context)
+def category(requset,slug):
+    category = Category.objects.get(slug=slug)
+    products = Product.objects.filter(category = category)
+    context = {'products':products}
+    return render (requset ,'category.html', context )
 
 # TODO
 # 1- register
