@@ -47,15 +47,18 @@ Details
 
     <section class="container py-5">
         <div class="row">
+
             <div class="col-md-6">
+
                 <img src="{{ this_product.image.url }}" alt="{{ this_product.name }}" class="product-image">
             </div>
+
             <div class="col-md-6 product-details">
                 <h1>{{ this_product.name }}</h1>
                 <p>{{ this_product.description }}</p>
                 <p class="product-price">Price: ${{ this_product.price }}</p>
 
-                <a href = 'add_to_cart/{{ this_product.id }}' class="btn btn-success btn-lg">Add to Cart</a>
+                <a href = 'add_to_cart/{{ this_product.slug}}' class="btn btn-success btn-lg">Add to Cart</a>
 
                 <button class="btn btn-secondary mt-3" id="toggle-details">More Details</button>
                 <div class="collapse-details mt-3" id="extra-details">

@@ -18,14 +18,15 @@ index page
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
 
-                    <li class="nav-item">
-                        <a class="nav-link" >Register</a>
-                    </li>
+
                     {% if  log  %}
                         <li class="nav-item">
                         <a href = '/logout' class="nav-link" >Logout</a>
                         </li>
                     {% else  %}
+                        <li class="nav-item">
+                        <a href =  '{% url 'register' %}' class="nav-link" >Register</a>
+                    </li>
                         <li class="nav-item">
                         <a href = '/login' class="nav-link" >Login</a>
                         </li>
@@ -72,20 +73,22 @@ index page
         </div>
     </section>
 
-    <section class="container py-5">
-        <div class="row g-4">
-            <div class="col-md-4 mx-auto">
-                <div class="card h-100 text-center">
-                    <a href="lost/" class="text-decoration-none">
-                        <div class="card-body">
-                            <h3 class="card-title">Lost Token</h3>
-                            <p class="card-text">You can get your token with your username and password.</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
+{#    <section class="container py-5">#}
+{#        <div class="row g-4">#}
+{#            <div class="col-md-4 mx-auto">#}
+{#                <div class="card h-100 text-center">#}
+{#                    <a href="lost/" class="text-decoration-none">#}
+{#                        <div class="card-body">#}
+{#                            <h3 class="card-title">Lost Token</h3>#}
+{#                            <p class="card-text">You can get your token with your username and password.</p>#}
+{#                        </div>#}
+{#                    </a>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{##}
+{##}
+{#    </section>#}
 
     <footer class="bg-dark text-white text-center py-3">
         <p>&copy; 2024 Finance Hub. All Rights Reserved.</p>

@@ -41,23 +41,24 @@ def index(request):
             n += x.num
 
 
-    category = Category.objects.all()
-    context = {'log':log ,'user':request.user, 'n':n, "category":category}
+
+    context = {'log':log ,'user':request.user, 'n':n, }
     return render(request, 'index.html', context)
 
-def product(request):
-    log = False
-    products = Product.objects.all()
-    n= 0
-    if request.user.is_authenticated:
-        log = True
-        cart = Cart.objects.filter(user=request.user)
 
-        for x in cart:
-            n+= x.num
-
-    context = {'products': products , 'n':n , 'log':log}
-    return render (request, 'products.html', context=context)
+# def product(request):
+#     log = False
+#     products = Product.objects.all()
+#     n= 0
+#     if request.user.is_authenticated:
+#         log = True
+#         cart = Cart.objects.filter(user=request.user)
+#
+#         for x in cart:
+#             n+= x.num
+#
+#     context = {'products': products , 'n':n , 'log':log}
+#     return render (request, 'products.html', context=context)
 
 def details(request , slug):
     log = False
@@ -85,10 +86,10 @@ def add_cart(request,slug):
             in_cart = in_cart.first()
             in_cart.num += 1
             in_cart.save()
-            return redirect('purchase', id)
+            return redirect('purchase', slug=slug)
         else:
             cart_object=Cart.objects.create(user = request.user, product = this_product)
-            return redirect('purchase', id)
+            return redirect('purchase', slug=slug)
     else:
         return redirect('login')
 def cart(request):
@@ -106,11 +107,19 @@ def cart(request):
 
         context = {'cart':cart , 'all':all_total, 'lst':lst , 'len':len_lst}
         return render(request, 'cart.html', context)
-def category(requset,slug):
+def product(request):
+    category = Category.objects.all()
+    context = {'category':category}
+    # category = Category.objects.get(slug=slug)
+    # products = Product.objects.filter(category = category)
+    # context = {'products':products}
+    return render (request ,'products.html', context )
+def category(request,slug):
+
     category = Category.objects.get(slug=slug)
     products = Product.objects.filter(category = category)
     context = {'products':products}
-    return render (requset ,'category.html', context )
+    return render(request, 'category.html', context)
 
 # TODO
 # 1- register

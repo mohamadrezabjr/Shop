@@ -51,13 +51,14 @@ Products
         <div class="row g-4">
             {% for product in products %}
             <div class="col-md-4">
+
                 <div class="card h-100 text-center">
                     <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
                     <div class="card-body">
                         <h3 class="card-title">{{ product.name }}</h3>
                         <p class="card-text">{{ product.description }}</p>
                         <p class="fw-bold text-primary">${{ product.price }}</p>
-                        <a href="products/purchase/{{ product.slug }}" class="btn btn-primary">Details</a>
+                        <a href= "http://127.0.0.1:8000/products/purchase/{{ product.slug }}" class="btn btn-primary">Details</a>
                     </div>
                 </div>
             </div>

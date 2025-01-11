@@ -7,21 +7,31 @@ Products
 {% block content %}
 
 <header class="bg-primary text-white text-center py-4">
-        <h1>Finance</h1>
-        <p>A simple project</p>
+        <h1>Categories</h1>
+        <p></p>
     </header>
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Finance Hub</a>
+{#            <a class="navbar-brand" href="#">Finance Hub</a>#}
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a href = '{% url 'index' %}' class="nav-link" >Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" >Register</a>
+                    {% if  user.is_authenticated  %}
+                        <li class="nav-item">
+                        <a href = '/logout' class="nav-link" >Logout</a>
+                        </li>
+                    {% else  %}
+                        <li class="nav-item">
+                        <a href =  '{% url 'register' %}' class="nav-link" >Register</a>
                     </li>
+                        <li class="nav-item">
+                        <a href = '/login' class="nav-link" >Login</a>
+                        </li>
+                    {% endif %}
+
                     <li class="nav-item">
                         <a class="nav-link" href="https://github.com/mohamadrezabjr">Contact</a>
                     </li>
@@ -47,23 +57,29 @@ Products
         </div>
     </section>
 
-    <section class="container py-5">
+
+
+ <section class="container py-5">
+
         <div class="row g-4">
-            {% for product in products %}
-            <div class="col-md-4">
+            {% for cat in category %}
+            <div class="col-md-4 mx-auto">
                 <div class="card h-100 text-center">
-                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                    <a href="http://127.0.0.1:8000/products/category/{{ cat.slug }}" class="text-decoration-none">
                     <div class="card-body">
-                        <h3 class="card-title">{{ product.name }}</h3>
-                        <p class="card-text">{{ product.description }}</p>
-                        <p class="fw-bold text-primary">${{ product.price }}</p>
-                        <a href="products/purchase/{{ product.slug }}" class="btn btn-primary">Details</a>
+                         <h3 class="card-title">{{ cat.name }}</h3>
+                        <p class="card-text"></p>
                     </div>
+                    </a>
                 </div>
             </div>
-            {% endfor %}
+        {% endfor %}
         </div>
+
     </section>
+
+
+
 
     <footer class="bg-dark text-white text-center py-3">
         <p>&copy; 2024 Finance Hub. All Rights Reserved.</p>
