@@ -58,7 +58,7 @@ def index(request):
 #             n+= x.num
 #
 #     context = {'products': products , 'n':n , 'log':log}
-#     return render (request, 'products.html', context=context)
+#     return render (request, 'categories.html', context=context)
 
 def details(request , slug):
     log = False
@@ -113,13 +113,13 @@ def product(request):
     # category = Category.objects.get(slug=slug)
     # products = Product.objects.filter(category = category)
     # context = {'products':products}
-    return render (request ,'products.html', context )
+    return render (request, 'categories.html', context)
 def category(request,slug):
 
     category = Category.objects.get(slug=slug)
     products = Product.objects.filter(category = category)
     context = {'products':products}
-    return render(request, 'category.html', context)
+    return render(request, 'products.html', context)
 
 # TODO
 # 1- register
