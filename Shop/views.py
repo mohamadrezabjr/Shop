@@ -28,7 +28,7 @@ def register(request):
     return render (request , 'registration/register.html',{'form':form})
 def logout_view(request):
     logout(request)
-    return redirect('/')
+    return redirect("/")
 def index(request):
 
     log= False
@@ -46,20 +46,6 @@ def index(request):
     return render(request, 'index.html', context)
 
 
-# def product(request):
-#     log = False
-#     products = Product.objects.all()
-#     n= 0
-#     if request.user.is_authenticated:
-#         log = True
-#         cart = Cart.objects.filter(user=request.user)
-#
-#         for x in cart:
-#             n+= x.num
-#
-#     context = {'products': products , 'n':n , 'log':log}
-#     return render (request, 'categories.html', context=context)
-
 def details(request , slug):
     log = False
     this_product = Product.objects.get(slug=slug)
@@ -68,11 +54,10 @@ def details(request , slug):
     if request.user.is_authenticated:
         log = True
         cart = Cart.objects.filter(user=request.user)
-
         for x in cart:
             n += x.num
-
-    context = {'this_product': this_product ,  'n':n , 'log':log}
+    extra = this_product.extra_details.split('\n')
+    context = {'this_product': this_product ,  'n':n , 'log':log , 'extra':extra}
 
     return render(request , "details.html", context=context)
 
@@ -107,18 +92,29 @@ def cart(request):
 
         context = {'cart':cart , 'all':all_total, 'lst':lst , 'len':len_lst}
         return render(request, 'cart.html', context)
-def product(request):
-    category = Category.objects.all()
-    context = {'category':category}
-    # category = Category.objects.get(slug=slug)
-    # products = Product.objects.filter(category = category)
-    # context = {'products':products}
-    return render (request, 'categories.html', context)
-def category(request,slug):
 
+def categories(request):
+    category = Category.objects.all()
+
+    n = 0
+    if request.user.is_authenticated:
+
+        cart = Cart.objects.filter(user=request.user)
+        for x in cart:
+            n += x.num
+    context = {'category':category, 'n' : n}
+    return render(request, 'categories.html', context)
+
+def product(request, slug):
     category = Category.objects.get(slug=slug)
     products = Product.objects.filter(category = category)
-    context = {'products':products}
+
+    n = 0
+    if request.user.is_authenticated:
+        cart = Cart.objects.filter(user=request.user)
+        for x in cart:
+            n += x.num
+    context = {'products':products , 'category':category, 'n':n}
     return render(request, 'products.html', context)
 
 # TODO

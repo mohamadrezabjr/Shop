@@ -17,7 +17,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
     slug = models.SlugField(max_length=50, default="", null=True, blank=True)
     def __str__(self):
-        return self.name
+        return '{} - {}'.format(self.name, self.category)
 class Cart(models.Model):
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
@@ -26,6 +26,6 @@ class Cart(models.Model):
 
 
     def __str__(self):
-        return (f"{self.num} of {self.product.name}  ")
+        return (f"{self.num} of {self.product.name} for {self.user.username} ")
 
 # Create your models here.
