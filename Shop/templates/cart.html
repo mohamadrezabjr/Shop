@@ -65,16 +65,26 @@
                     {% for x in cart  %}
                         <tr>
                             <td>
+                                {% if x.product.image.exists %}
+
                                 <img src="{{ x.product.image.url }}" alt="{{ x.product.name }}" class="rounded me-2" style="width: 50px; height: 50px;">
+                                {% else %}
+                        <img src='{% static "/images/no_image.jpg" %}' class="rounded me-2" alt="{{ x.product.name }}" style="width: 50px; height: 50px;">
+                    {% endif %}
                                 {{x.product.name}}
                             </td>
                             <td>${{x.product.price}}</td>
                             <td>{{x.num}}</td>
                             <td>${{ x.num|multiply:x.product.price }}</td>
                             <td>
-                                <button class="btn btn-danger btn-sm">
+
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" id = 'id' name = 'id' value = '{{ x.id }}'>
+                                    <button class="btn btn-danger btn-sm">
                                     <i class="bi bi-trash"></i> Remove
                                 </button>
+                                </form>
                             </td>
                         </tr>
                     {% endfor%}

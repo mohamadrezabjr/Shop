@@ -74,23 +74,29 @@ def add_cart(request,slug):
             return redirect('purchase', slug=slug)
         else:
             cart_object=Cart.objects.create(user = request.user, product = this_product)
+            cart_object.save()
             return redirect('purchase', slug=slug)
     else:
         return redirect('login')
 def cart(request):
 
-    lst = []
+    if request.method == 'POST':
+        this_cart = Cart.objects.filter(id = request.POST['id']).first()
+        if this_cart.num >1 :
+            this_cart.num -= 1
+            this_cart.save()
+        else :
+            this_cart.delete()
+        return redirect('cart')
+
+    total = 0
 
     if request.user.is_authenticated:
         cart = Cart.objects.filter(user=request.user)
         for x in cart:
-            total = 0
             total += x.num * x.product.price
-            lst.append(total)
-        all_total = sum(lst)
-        len_lst = range(len(lst))
 
-        context = {'cart':cart , 'all':all_total, 'lst':lst , 'len':len_lst}
+        context = {'cart':cart , 'all':total,}
         return render(request, 'cart.html', context)
 
 def categories(request):
@@ -118,7 +124,7 @@ def product(request, slug):
     return render(request, 'products.html', context)
 
 # TODO
-# 1- register
+# 1- register +
 # 2- profile
 # 3- discount
 # 4- more images for details

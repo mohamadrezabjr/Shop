@@ -21,11 +21,26 @@ class Product(models.Model):
 class Cart(models.Model):
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     num = models.IntegerField(default=1)
 
 
     def __str__(self):
         return (f"{self.num} of {self.product.name} for {self.user.username} ")
+class Order(models.Model):
+    status_choices = (
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('ontheway', 'Ontheway'),
+        ('canceled', 'Canceled'),
+    )
+    status = models.CharField(max_length=10, choices=status_choices, default='pending')
+    products = models.ManyToManyField(Cart)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    address = models.TextField()
+
+    def __str__(self):
+        return f"Oreder of{self.user} is {self.status}."
 
 # Create your models here.

@@ -63,7 +63,11 @@ Products
             <div class="col-md-4">
 
                 <div class="card h-100 text-center">
+                    {% if product.image.exists %}
                     <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        {% else %}
+                        <img src='{% static "/images/no_image.jpg" %}'class="card-img-top" alt="{{ product.name }}">
+                    {% endif %}
                     <div class="card-body">
                         <h3 class="card-title">{{ product.name }}</h3>
                         <p class="card-text">{{ product.description }}</p>
