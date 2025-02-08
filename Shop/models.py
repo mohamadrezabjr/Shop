@@ -21,7 +21,6 @@ class Product(models.Model):
 class Cart(models.Model):
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
-
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     num = models.IntegerField(default=1)
 
@@ -39,6 +38,9 @@ class Order(models.Model):
     products = models.ManyToManyField(Cart)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.TextField()
+    number = models.IntegerField()
+    city = models.TextField()
+    price = models.FloatField()
 
     def __str__(self):
         return f"Oreder of{self.user} is {self.status}."

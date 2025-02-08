@@ -123,6 +123,20 @@ def product(request, slug):
     context = {'products':products , 'category':category, 'n':n}
     return render(request, 'products.html', context)
 
+def checkout(request):
+    total = 0
+    products = Cart.objects.filter(user = request.user)
+    for x in products:
+            total += x.num * x.product.price
+    if request.method == 'POST':
+        order= Order.objects.create(user = request.user , address = request.POST['address'],
+                                    city = request.POST['city'], number = request.POST['number'] , price = total)
+        order.products.set(products)
+        order.save()
+        return redirect('index')
+
+    context = {'total':total, 'products':products}
+    return render(request, 'checkout.html' ,context)
 # TODO
 # 1- register +
 # 2- profile

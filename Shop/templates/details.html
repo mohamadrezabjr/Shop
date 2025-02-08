@@ -45,7 +45,7 @@ Details
         <div class="row">
 
             <div class="col-md-6">
-            {% if this_product.image.exists %}
+            {% if this_product.image %}
                 <img src="{{ this_product.image.url }}" alt="{{ this_product.name }}" class="product-image">
             {% else %}
                         <img src='{% static "/images/no_image.jpg" %}'class="card-img-top" alt="{{ this_product.name }}">
