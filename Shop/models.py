@@ -42,6 +42,7 @@ class Order(models.Model):
     number = models.IntegerField()
     city = models.TextField()
     price = models.FloatField()
+    date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Oreder of{self.user} is {self.status}."

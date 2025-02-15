@@ -62,8 +62,8 @@ def add_cart(request,slug):
         this_product = Product.objects.get(slug=slug)
         in_cart = Cart.objects.filter(product = this_product , user = request.user)
 
-        if in_cart.exists():
-            in_cart = in_cart.first()
+        if in_cart.exists() and  in_cart.last().ordered == False:
+            in_cart = in_cart.last()
             in_cart.num += 1
             in_cart.save()
             return redirect('purchase', slug=slug)
