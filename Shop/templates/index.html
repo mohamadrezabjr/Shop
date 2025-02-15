@@ -17,7 +17,7 @@ index page
                 <ul class="navbar-nav ms-auto">
 
 
-                    {% if  log  %}
+                    {% if  user.is_authenticated  %}
                         <li class="nav-item">
                         <a href = '/logout' class="nav-link" >Logout</a>
                         </li>
@@ -34,7 +34,7 @@ index page
                         <a class="nav-link" href="https://github.com/mohamadrezabjr">Contact</a>
                     </li>
                 </ul>
-            {% if log %}
+            {% if user.is_authenticated %}
             <a class="nav-link" href =  '{% url 'index' %}'>
                 <div class="cart-container">
                     <a href = '{% url 'cart' %}' style="text-decoration: none">

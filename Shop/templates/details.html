@@ -25,7 +25,7 @@ Details
                         <a class="nav-link" href="https://github.com/mohamadrezabjr">Contact</a>
                     </li>
                 </ul>
-                {% if log %}
+                {% if user.is_authenticated %}
                 <div class="cart-container">
                     <a href = '{% url 'cart' %}' style="text-decoration: none">
                     <i class="bi bi-cart cart-icon"></i>

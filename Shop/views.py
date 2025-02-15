@@ -30,19 +30,14 @@ def logout_view(request):
     logout(request)
     return redirect("/")
 def index(request):
-
-    log= False
     n= 0
     if request.user.is_authenticated:
-        log = True
-        cart = Cart.objects.filter(user=request.user)
 
+        cart = Cart.objects.filter(user=request.user, ordered=False)
         for x in cart:
             n += x.num
 
-
-
-    context = {'log':log ,'user':request.user, 'n':n, }
+    context = {'user':request.user, 'n':n, }
     return render(request, 'index.html', context)
 
 
@@ -53,7 +48,7 @@ def details(request , slug):
     n = 0
     if request.user.is_authenticated:
         log = True
-        cart = Cart.objects.filter(user=request.user)
+        cart = Cart.objects.filter(user=request.user, ordered=False)
         for x in cart:
             n += x.num
     extra = this_product.extra_details.split('\n')
@@ -92,7 +87,7 @@ def cart(request):
     total = 0
 
     if request.user.is_authenticated:
-        cart = Cart.objects.filter(user=request.user)
+        cart = Cart.objects.filter(user=request.user,ordered = False)
         for x in cart:
             total += x.num * x.product.price
 
@@ -101,11 +96,10 @@ def cart(request):
 
 def categories(request):
     category = Category.objects.all()
-
     n = 0
     if request.user.is_authenticated:
 
-        cart = Cart.objects.filter(user=request.user)
+        cart = Cart.objects.filter(user=request.user, ordered=False)
         for x in cart:
             n += x.num
     context = {'category':category, 'n' : n}
@@ -114,10 +108,9 @@ def categories(request):
 def product(request, slug):
     category = Category.objects.get(slug=slug)
     products = Product.objects.filter(category = category)
-
     n = 0
     if request.user.is_authenticated:
-        cart = Cart.objects.filter(user=request.user)
+        cart = Cart.objects.filter(user=request.user,ordered = False)
         for x in cart:
             n += x.num
     context = {'products':products , 'category':category, 'n':n}
@@ -125,18 +118,25 @@ def product(request, slug):
 
 def checkout(request):
     total = 0
-    products = Cart.objects.filter(user = request.user)
+    products = Cart.objects.filter(user = request.user,ordered = False)
     for x in products:
             total += x.num * x.product.price
     if request.method == 'POST':
         order= Order.objects.create(user = request.user , address = request.POST['address'],
                                     city = request.POST['city'], number = request.POST['number'] , price = total)
         order.products.set(products)
+        for y in products:
+            y.ordered= True
+            y.save()
         order.save()
         return redirect('index')
 
     context = {'total':total, 'products':products}
     return render(request, 'checkout.html' ,context)
+
+def test(request):
+
+    return render(request, 'test.html')
 # TODO
 # 1- register +
 # 2- profile

@@ -23,10 +23,11 @@ class Cart(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     num = models.IntegerField(default=1)
-
-
+    ordered = models.BooleanField(default=False)
     def __str__(self):
         return (f"{self.num} of {self.product.name} for {self.user.username} ")
+
+
 class Order(models.Model):
     status_choices = (
         ('pending', 'Pending'),

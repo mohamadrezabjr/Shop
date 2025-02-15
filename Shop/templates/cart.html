@@ -63,6 +63,7 @@
                     <tbody>
 
                     {% for x in cart  %}
+                        {% if not x.ordered %}
                         <tr>
                             <td>
                                 {% if x.product.image %}
@@ -87,6 +88,7 @@
                                 </form>
                             </td>
                         </tr>
+                        {% endif %}
                     {% endfor%}
 
                     </tbody>
