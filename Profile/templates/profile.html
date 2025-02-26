@@ -37,6 +37,7 @@ User Profile
 {% endblock %}
 {% block content %}
 
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="#"></a>
@@ -87,14 +88,24 @@ User Profile
             <div class="tab-content mt-3" id="profileTabsContent">
                 <div class="tab-pane fade show active" id="info" role="tabpanel">
                     <h4>User Information</h4>
-                    <p><strong>Name:</strong> Mohammad Reza</p>
-                    <p><strong>Email:</strong> example@example.com</p>
+                    <p><strong>Name:</strong> {{ name }}</p>
+                    <p><strong>Email:</strong> {{ email }}</p>
                 </div>
                 <div class="tab-pane fade" id="orders" role="tabpanel">
                     <h4>Your Orders</h4>
-                    <ul>
-                        <li>Order 1 - Processing</li>
-                        <li>Order 2 - Delivered</li>
+                    <ul class="list-group">
+                        {% for x in order %}
+
+                            <li class="list-group-item order-item">
+
+                            <div class="order-details">
+                                <p><strong>Date :</strong> {{ x.date.date }}</p>
+                                <p><strong>Status :</strong> {{ x.status }}</p>
+                                <p><strong>Price:</strong> {{ x.price }} $</p>
+                            </div>
+                            <a href="order/{{ x.token }}" class="btn btn-primary">View Details</a>
+                        </li>
+                        {% endfor %}
                     </ul>
                 </div>
                 <div class="tab-pane fade" id="settings" role="tabpanel">
