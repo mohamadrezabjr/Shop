@@ -12,15 +12,30 @@ Details
 {% block content %}
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href={% url "index" %}>Home</a>
+                        <a href = '{% url 'index' %}' class="nav-link" >Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/products">Products</a>
+                    {% if  user.is_authenticated  %}
+                        <li class="nav-item">
+                        <a href = '/logout' class="nav-link" >Logout</a>
+                        </li>
+                        <li class="nav-item">
+                        <a href = '{% url 'profile' %}' class="nav-link" >Profile</a>
+                        </li>
+                    {% else  %}
+                        <li class="nav-item">
+                        <a href =  '{% url 'register' %}' class="nav-link" >Register</a>
                     </li>
+                        <li class="nav-item">
+                        <a href = '/login' class="nav-link" >Login</a>
+                        </li>
+                    {% endif %}
+
                     <li class="nav-item">
                         <a class="nav-link" href="https://github.com/mohamadrezabjr">Contact</a>
                     </li>
@@ -35,8 +50,6 @@ Details
                     </a>
                 </div>
                 {% endif %}
-                </div>
-                </a>
             </div>
         </div>
     </nav>
@@ -56,8 +69,12 @@ Details
                 <h1>{{ this_product.name }}</h1>
                 <p>{{ this_product.description }}</p>
                 <p class="product-price">Price: ${{ this_product.price }}</p>
-
-                <a href = 'add_to_cart/{{ this_product.token}}' class="btn btn-success btn-lg">Add to Cart</a>
+                <form method = 'POST'>
+                    {% csrf_token %}
+                <input type = 'hidden' id = 'token' name = 'token' value = '{{ this_product.token }}'>
+                    <button class="btn btn-success btn-lg">Add to Cart</button>
+{#                    <a href = 'add_to_cart/{{ this_product.token}}' ></a>#}
+                </form>
                 <div class = 'm3'>
                 <button  id="toggle-details" style="background-color: #17a2b8; color: white; border: none; border-radius: 5px; padding: 10px 15px; font-size: 16px; cursor: pointer; transition: background-color 0.3s; margin-top: 20px;">More Details</button>
                 </div>
@@ -79,6 +96,20 @@ Details
             const details = document.getElementById('extra-details');
             details.classList.toggle('show');
         });
+         document.addEventListener("DOMContentLoaded", function() {
+    var navbarToggler = document.querySelector(".navbar-toggler");
+    var navbarCollapse = document.querySelector(".navbar-collapse");
+
+    document.addEventListener("click", function(event) {
+        var isClickInsideNavbar = navbarCollapse.contains(event.target) || navbarToggler.contains(event.target);
+
+        if (!isClickInsideNavbar && navbarCollapse.classList.contains("show")) {
+            new bootstrap.Collapse(navbarCollapse).hide();
+        }
+    });
+});
+
+
     </script>
 </html>
 

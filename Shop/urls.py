@@ -3,14 +3,17 @@ from . import views
 
 urlpatterns = [
     path ('' , views.index, name='index'),
-    path('products', views.categories, name='products'),
-    path ('products/purchase/<str:token>' , views.details, name='purchase'),
+    path('categories/', views.categories, name='categories'),
+    path ('products/', views.products, name='all_products'),
+    path ('products/<str:token>' , views.details, name='detail'),
+    path ('products/add_to_cart/<str:token>' , views.add_cart, name='add_to_cart'),
     path ('logout/' , views.logout_view, name='log_out'),
-    path ('products/purchase/add_to_cart/<str:token>' , views.add_cart, name='add_to_cart'),
+
     path ('cart/' ,views.cart, name='cart'),
     path ('register/' ,views.register,name = 'register' ),
-    path ('products/category/<str:name>', views.product, name='category'),
+    path ('categories/<str:name>/', views.category_products, name='category_products'),
     path ('checkout/' , views.checkout, name='checkout'),
+    path ('search/' , views.search, name='search'),
     path ('test/' , views.test)
 
  ]

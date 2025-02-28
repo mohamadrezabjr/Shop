@@ -1,36 +1,29 @@
-{% extends 'master.html' %}
+{% extends "master.html" %}
 {% load static %}
-{% block title %}
-Products
-{% endblock %}
+{% block title %}Search{% endblock %}
+
 {% block header %}
-    <h1>Categories</h1>
+    <h1>Search Products</h1>
+    <p>Enter product name</p>
+{% endblock %}
 
-        {% endblock %}
 {% block content %}
-
-
-
-
-
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
-
+            <a class="navbar-brand" href="#">Welcome Dear {{ user.username }} !</a>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a href = '{% url 'index' %}' class="nav-link" >Home</a>
-                    </li>
+
+
                     {% if  user.is_authenticated  %}
                         <li class="nav-item">
                         <a href = '/logout' class="nav-link" >Logout</a>
                         </li>
                         <li class="nav-item">
-                        <a href = '{% url 'profile' %}' class="nav-link" >Profile</a>
+                        <a href = '/profile' class="nav-link" >Profile</a>
                         </li>
                     {% else  %}
                         <li class="nav-item">
@@ -45,8 +38,8 @@ Products
                         <a class="nav-link" href="https://github.com/mohamadrezabjr">Contact</a>
                     </li>
                 </ul>
-                {% if user.is_authenticated %}
-                <div class="cart-container">
+            {% if user.is_authenticated %}
+            <div class="cart-container">
                     <a href = '{% url 'cart' %}' style="text-decoration: none">
                     <i class="bi bi-cart cart-icon"></i>
                     <img src = "{% static 'images/cart.png' %}" alt="Cart" class="cart-icon">
@@ -54,42 +47,47 @@ Products
                     </span>
                     </a>
                 </div>
-                {% endif %}
+            {% endif %}
             </div>
         </div>
     </nav>
+    <section class="container py-5">
+        <form method="GET" action="{% url 'search' %}">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" name="q" placeholder="Search for products..." value="{{ request.GET.q }}" required>
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </form>
 
-    <section class="text-center bg-light py-5">
-        <div class="container">
-            <h1>Available Products</h1>
-            <p class="lead">Browse and purchase the best products tailored to your needs.</p>
-        </div>
-    </section>
+        {% if products %}
+            <h2>Search Results</h2>
+            <div class="row g-4">
+            {% for product in products %}
+            <div class="col-md-4">
 
-
-
- <section class="container py-5">
-
-        <div class="row g-4">
-            {% for cat in category %}
-            <div class="col-md-4 mx-auto">
                 <div class="card h-100 text-center">
-                    <a href="{{ cat.name }}/" class="text-decoration-none">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        {% else %}
+                        <img src='{% static "/images/no_image.jpg" %}'class="card-img-top" alt="{{ product.name }}">
+                    {% endif %}
                     <div class="card-body">
-                         <h3 class="card-title">{{ cat.name }}</h3>
-                        <p class="card-text"></p>
+                        <h3 class="card-title">{{ product.name }}</h3>
+                        <p class="card-text">{{ product.description }}</p>
+                        <p class="fw-bold text-primary">${{ product.price }}</p>
+                        <a href= "http://127.0.0.1:8000/products/{{ product.token }}" class="btn btn-primary">Details</a>
                     </div>
-                    </a>
                 </div>
             </div>
-        {% endfor %}
-
-        </div>
-
+                {% endfor %}
+            </div>
+        {% elif request.GET.q %}
+            <p>No products found matching "{{ request.GET.q }}".</p>
+        {% endif %}
     </section>
 
-    <script >
-    document.addEventListener("DOMContentLoaded", function() {
+    <script>
+  document.addEventListener("DOMContentLoaded", function() {
     var navbarToggler = document.querySelector(".navbar-toggler");
     var navbarCollapse = document.querySelector(".navbar-collapse");
 
