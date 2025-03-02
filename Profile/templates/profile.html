@@ -110,7 +110,8 @@ User Profile
                 </div>
                 <div class="tab-pane fade" id="settings" role="tabpanel">
                     <h4>Settings</h4>
-                    <button class="btn btn-danger">Change Password</button>
+                    <a href = "{% url 'password_reset' %}">
+                    <button class="btn btn-danger">Change Password</button></a>
                 </div>
             </div>
         </div>
