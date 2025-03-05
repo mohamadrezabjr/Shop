@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
 
+
 class ResetPassword(PasswordResetView , SuccessMessageMixin):
     template_name = 'password_reset_form.html'
     email_template_name = 'password_reset_email.html'

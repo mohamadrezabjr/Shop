@@ -7,6 +7,14 @@ from .models import *
 
 from .forms import *
 
+def cart_num(r):
+    n= 0
+    if r.user.is_authenticated:
+
+        cart = Cart.objects.filter(user=r.user, ordered=False)
+        for x in cart:
+            n += x.num
+    return n
 
 def register(request):
     form = RegisterForm()
@@ -31,23 +39,13 @@ def logout_view(request):
 
 
 def index(request):
-    n = 0
-    if request.user.is_authenticated:
 
-        cart = Cart.objects.filter(user=request.user, ordered=False)
-        for x in cart:
-            n += x.num
-
+    n= cart_num(request)
     context = {'user': request.user, 'n': n, }
     return render(request, 'index.html', context)
 
 def products(request):
-    n = 0
-    if request.user.is_authenticated:
-
-        cart = Cart.objects.filter(user=request.user, ordered=False)
-        for x in cart:
-            n += x.num
+    n = cart_num(request)
     products = Product.objects.all()
     return render (request, 'products.html', {'products': products,'n':n})
 def details(request, token):
@@ -71,12 +69,7 @@ def details(request, token):
     log = False
     this_product = get_object_or_404(Product, token=token)
 
-    n = 0
-    if request.user.is_authenticated:
-        log = True
-        cart = Cart.objects.filter(user=request.user, ordered=False)
-        for x in cart:
-            n += x.num
+    n = cart_num(request)
     extra = this_product.extra_details.split('\n')
     context = {'this_product': this_product, 'n': n, 'log': log, 'extra': extra}
 
@@ -124,12 +117,7 @@ def cart(request):
 
 def categories(request):
     category = Category.objects.all()
-    n = 0
-    if request.user.is_authenticated:
-
-        cart = Cart.objects.filter(user=request.user, ordered=False)
-        for x in cart:
-            n += x.num
+    n = cart_num(request)
     context = {'category': category, 'n': n}
     return render(request, 'categories.html', context)
 
@@ -137,11 +125,7 @@ def categories(request):
 def category_products(request, name):
     category = Category.objects.get(name=name)
     products = Product.objects.filter(category=category)
-    n = 0
-    if request.user.is_authenticated:
-        cart = Cart.objects.filter(user=request.user, ordered=False)
-        for x in cart:
-            n += x.num
+    n = cart_num(request)
     context = {'products': products, 'category': category, 'n': n}
     return render(request, 'products.html', context)
 
@@ -165,24 +149,18 @@ def checkout(request):
     return render(request, 'checkout.html', context)
 
 def search(request):
-    n = 0
-    if request.user.is_authenticated:
-
-        cart = Cart.objects.filter(user=request.user, ordered=False)
-        for x in cart:
-            n += x.num
+    n = cart_num(request)
     products = []
     try:
         q = request.GET.get('q').replace(' ' , '')
     except:
         q = request.GET.get('q')
+
     if q:
         products = Product.objects.filter(Q(name__icontains=q) | Q(description__icontains=q))
 
-    if products:
-        context = {'products': products , 'n': n}
-    else:
-        context = {'products': [], 'n' :n}
+    context = {'products': products , 'n': n}
+
 
     return render (request,'search.html' ,context)
 def test(request):
