@@ -71,6 +71,8 @@ Details
                 <p class="product-price">Price: ${{ this_product.price }}</p>
                 <form method = 'POST'>
                     {% csrf_token %}
+                        <input type="hidden" name="id" value="{{ x.id }}">
+                <input type="number" name="quantity" value="1"  min="1" class="form-control" style="width: 70px; display: inline-block;">
                 <input type = 'hidden' id = 'token' name = 'token' value = '{{ this_product.token }}'>
                     <button class="btn btn-success btn-lg">Add to Cart</button>
 {#                    <a href = 'add_to_cart/{{ this_product.token}}' ></a>#}

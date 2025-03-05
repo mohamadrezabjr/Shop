@@ -36,17 +36,7 @@
                     </li>
 
                 </ul>
-                {% if log %}
-                <a class="nav-link" href =  '{% url 'cart' %}'>
-                <div class="cart-container">
-                    <i class="bi bi-cart cart-icon"></i>
-                    <img src = "{% static 'images/cart.png' %}" alt="Cart" class="cart-icon">
-                    <span class="cart-count"> {{ n }}
-                    </span>
-                </div>
-                </a>
-                {% endif %}
-                </div>
+
                 </a>
             </div>
         </div>
@@ -84,13 +74,22 @@
                                 {{x.product.name}}
                             </td>
                             <td>${{x.product.price}}</td>
-                            <td>{{x.num}}</td>
+                            <td>
+                                <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="id" value="{{ x.id }}">
+                                 <input type = 'hidden' name = 'action'  value="change">
+                                <input type="number" name="quantity" value="{{ x.num }}" min="1" class="form-control" style="width: 70px; display: inline-block;">
+                                <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                            </form>
+                            </td>
                             <td>${{ x.num|multiply:x.product.price }}</td>
                             <td>
 
                                 <form method="post">
                                     {% csrf_token %}
-                                    <input type="hidden" id = 'id' name = 'id' value = '{{ x.id }}'>
+                                    <input type="hidden" name = 'id' value = '{{ x.id }}'>
+                                    <input type = 'hidden' name = 'action'  value="remove">
                                     <button class="btn btn-danger btn-sm">
                                     <i class="bi bi-trash"></i> Remove
                                 </button>

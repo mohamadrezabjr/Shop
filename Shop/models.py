@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 import string ,random
 
 def code_generator(type = 'P' , length = 7): #Default for products
-
         code = type + '-'+''.join(random.choices(string.digits, k = length))
+
         return code
 
 
@@ -32,7 +32,6 @@ class Product(models.Model):
             self.token = code_generator()
         super().save(*args, **kwargs)
 
-
     def __str__(self):
         return '{} - {}'.format(self.name, self.category)
 
@@ -51,8 +50,9 @@ class Order(models.Model):
     status_choices = (
         ('Pending', 'Pending'),
         ('Confirmed', 'Confirmed'),
-        ('OnTheway', 'Ontheway'),
+        ('OnTheWay', 'OnThWway'),
         ('Canceled', 'Canceled'),
+        ('Completed', 'Completed')
     )
     status = models.CharField(max_length=10, choices=status_choices, default='pending')
     products = models.ManyToManyField(Cart)

@@ -1,4 +1,3 @@
-
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.contrib.auth import authenticate, logout, login
@@ -7,14 +6,16 @@ from .models import *
 
 from .forms import *
 
+
 def cart_num(r):
-    n= 0
+    n = 0
     if r.user.is_authenticated:
 
         cart = Cart.objects.filter(user=r.user, ordered=False)
         for x in cart:
             n += x.num
     return n
+
 
 def register(request):
     form = RegisterForm()
@@ -39,68 +40,54 @@ def logout_view(request):
 
 
 def index(request):
-
-    n= cart_num(request)
+    n = cart_num(request)
     context = {'user': request.user, 'n': n, }
     return render(request, 'index.html', context)
+
 
 def products(request):
     n = cart_num(request)
     products = Product.objects.all()
-    return render (request, 'products.html', {'products': products,'n':n})
+    return render(request, 'products.html', {'products': products, 'n': n})
+
+
 def details(request, token):
+
     if request.method == 'POST':
+        new_num = int(request.POST['quantity'])
         if request.user.is_authenticated:
-            this_product = get_object_or_404(Product,token=request.POST['token'])
+            this_product = get_object_or_404(Product, token=request.POST['token'])
             in_cart = Cart.objects.filter(product=this_product, user=request.user)
 
             if in_cart.exists() and in_cart.last().ordered == False:
                 in_cart = in_cart.last()
-                in_cart.num += 1
+                in_cart.num += new_num
                 in_cart.save()
                 return redirect('detail', token=token)
             else:
-                cart_object = Cart.objects.create(user=request.user, product=this_product)
+                cart_object = Cart.objects.create(user=request.user, product=this_product, num = new_num)
                 cart_object.save()
                 return redirect('detail', token=token)
         else:
             return redirect('login')
 
-    log = False
+
     this_product = get_object_or_404(Product, token=token)
 
     n = cart_num(request)
     extra = this_product.extra_details.split('\n')
-    context = {'this_product': this_product, 'n': n, 'log': log, 'extra': extra}
+    context = {'this_product': this_product, 'n': n,  'extra': extra}
 
     return render(request, "details.html", context=context)
-
-
-def add_cart(request, token):
-    if request.user.is_authenticated:
-        this_product = get_object_or_404(Product,token=token)
-        in_cart = Cart.objects.filter(product=this_product, user=request.user)
-
-        if in_cart.exists() and in_cart.last().ordered == False:
-            in_cart = in_cart.last()
-            in_cart.num += 1
-            in_cart.save()
-            return redirect('purchase', token=token)
-        else:
-            cart_object = Cart.objects.create(user=request.user, product=this_product)
-            cart_object.save()
-            return redirect('purchase', token=token)
-    else:
-        return redirect('login')
 
 
 def cart(request):
     if request.method == 'POST':
         this_cart = Cart.objects.filter(id=request.POST['id']).first()
-        if this_cart.num > 1:
-            this_cart.num -= 1
+        if request.POST['action'] == 'change':
+            this_cart.num = request.POST['quantity']
             this_cart.save()
-        else:
+        elif request.POST['action'] == 'remove':
             this_cart.delete()
         return redirect('cart')
 
@@ -136,8 +123,9 @@ def checkout(request):
     for x in products:
         total += x.num * x.product.price
     if request.method == 'POST':
-        order = Order.objects.create(user=request.user, address=request.POST['address'],
-                                     city=request.POST['city'], number=request.POST['number'], price=total)
+        post= request.POST
+        order = Order.objects.create(user=request.user, address=post['address'],
+                                     city=post['city'], number=post['number'], price=total)
         order.products.set(products)
         for y in products:
             y.ordered = True
@@ -148,21 +136,23 @@ def checkout(request):
     context = {'total': total, 'products': products}
     return render(request, 'checkout.html', context)
 
+
 def search(request):
     n = cart_num(request)
     products = []
     try:
-        q = request.GET.get('q').replace(' ' , '')
+        q = request.GET.get('q').replace(' ', '')
     except:
         q = request.GET.get('q')
 
     if q:
         products = Product.objects.filter(Q(name__icontains=q) | Q(description__icontains=q))
 
-    context = {'products': products , 'n': n}
+    context = {'products': products, 'n': n}
+
+    return render(request, 'search.html', context)
 
 
-    return render (request,'search.html' ,context)
 def test(request):
     return render(request, 'test.html')
 # TODO
