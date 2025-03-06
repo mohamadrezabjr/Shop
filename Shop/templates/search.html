@@ -8,23 +8,27 @@
 {% endblock %}
 
 {% block content %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
         <div class="container-fluid">
+
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
-            <a class="navbar-brand" href="#">Welcome Dear {{ user.username }} !</a>
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
 
+                <li class="nav-item">
+                        <a href = '{% url "index" %}' class="nav-link" >Home</a>
+                        </li>
 
                     {% if  user.is_authenticated  %}
                         <li class="nav-item">
                         <a href = '/logout' class="nav-link" >Logout</a>
                         </li>
-                        <li class="nav-item">
-                        <a href = '/profile' class="nav-link" >Profile</a>
-                        </li>
+
                     {% else  %}
                         <li class="nav-item">
                         <a href =  '{% url 'register' %}' class="nav-link" >Register</a>
@@ -37,9 +41,17 @@
                     <li class="nav-item">
                         <a class="nav-link" href="https://github.com/mohamadrezabjr">Contact</a>
                     </li>
-                </ul>
+
+                    </li>
+
             {% if user.is_authenticated %}
-            <div class="cart-container">
+
+                <li class="nav-item">
+                        <a href = '{% url 'profile' %}' class="nav-link" >Profile</a>
+                        </li>
+                </ul>
+
+                <div class="cart-container">
                     <a href = '{% url 'cart' %}' style="text-decoration: none">
                     <i class="bi bi-cart cart-icon"></i>
                     <img src = "{% static 'images/cart.png' %}" alt="Cart" class="cart-icon">

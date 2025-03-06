@@ -6,11 +6,9 @@ from .models import *
 
 from .forms import *
 
-
 def cart_num(r):
     n = 0
     if r.user.is_authenticated:
-
         cart = Cart.objects.filter(user=r.user, ordered=False)
         for x in cart:
             n += x.num
@@ -37,7 +35,6 @@ def register(request):
 def logout_view(request):
     logout(request)
     return redirect("/")
-
 
 def index(request):
     n = cart_num(request)
@@ -71,9 +68,7 @@ def details(request, token):
         else:
             return redirect('login')
 
-
     this_product = get_object_or_404(Product, token=token)
-
     n = cart_num(request)
     extra = this_product.extra_details.split('\n')
     context = {'this_product': this_product, 'n': n,  'extra': extra}
@@ -98,7 +93,7 @@ def cart(request):
         for x in cart:
             total += x.num * x.product.price
 
-        context = {'cart': cart, 'all': total, }
+        context = {'cart': cart, 'total': total, }
         return render(request, 'cart.html', context)
 
 

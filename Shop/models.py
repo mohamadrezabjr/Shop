@@ -3,15 +3,16 @@ from django.db import models
 from django.contrib.auth.models import User
 import string ,random
 
-def code_generator(type = 'P' , length = 7): #Default for products
-        code = type + '-'+''.join(random.choices(string.digits, k = length))
+def code_generator(type = 'P' , length = 7):  # Default for products
 
+        code = type + '-'+''.join(random.choices(string.digits, k = length))
         return code
 
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50, default="", null=True, blank=True)
+    image = models.ImageField(default='images/no_image.jpg')
 
     def __str__(self):
         return self.name
@@ -71,5 +72,3 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order of {self.user} is {self.status}. -- in : {self.date.ctime()}"
-
-# Create your models here.
