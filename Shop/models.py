@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.contrib.auth.models import User
 import string ,random
@@ -11,19 +12,20 @@ def code_generator(type = 'P' , length = 7):  # Default for products
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
-    slug = models.SlugField(max_length=50, default="", null=True, blank=True)
-    image = models.ImageField(default='images/no_image.jpg')
+    description = models.TextField(null=True, blank=True)
+    icon = models.ImageField(default='images/no_image.jpg')
 
     def __str__(self):
         return self.name
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
-    price = models.FloatField()
+    price = models.IntegerField()
     condition = models.BooleanField(default=True)
-    image = models.ImageField(null=True, blank=True)
+    image = models.ImageField(default='images/no_image.jpg',null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     extra_details = models.TextField(null=True, blank=True, default=None)
+    discount = models.IntegerField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
     token= models.CharField( blank= True, max_length=10,null= True  )
 
@@ -31,6 +33,9 @@ class Product(models.Model):
         if not self.token:
             self.token = code_generator()
         super().save(*args, **kwargs)
+    @property
+    def sale_price(self):
+        return int(self.price - self.price * (self.discount/100))
 
     def __str__(self):
         return '{} - {}'.format(self.name, self.category)

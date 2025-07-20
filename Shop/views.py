@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.contrib.auth import authenticate, logout, login
 from django.shortcuts import render, redirect
 from .models import *
-
+from django.contrib import messages
 from .forms import *
 
 def cart_num(r):
@@ -38,7 +38,9 @@ def logout_view(request):
 
 def index(request):
     n = cart_num(request)
-    context = {'user': request.user, 'n': n, }
+    products = Product.objects.all()
+    categories = Category.objects.all()
+    context = {"products" : products, 'n': n, "categories": categories }
     return render(request, 'index.html', context)
 
 
@@ -54,9 +56,9 @@ def details(request, token):
         new_num = int(request.POST['quantity'])
         if request.user.is_authenticated:
             this_product = get_object_or_404(Product, token=request.POST['token'])
-            in_cart = Cart.objects.filter(product=this_product, user=request.user)
+            in_cart = Cart.objects.filter(product=this_product, user=request.user, oredered=False)
 
-            if in_cart.exists() and in_cart.last().ordered == False:
+            if in_cart.exists():
                 in_cart = in_cart.last()
                 in_cart.num += new_num
                 in_cart.save()
@@ -65,6 +67,7 @@ def details(request, token):
                 cart_object = Cart.objects.create(user=request.user, product=this_product, num = new_num)
                 cart_object.save()
                 return redirect('detail', token=token)
+
         else:
             return redirect('login')
 
@@ -75,8 +78,24 @@ def details(request, token):
 
     return render(request, "details.html", context=context)
 
+def add_to_cart(request, token):
+    if request.user.is_authenticated:
+        referer = request.META.get('HTTP_REFERER')
+        this_product = get_object_or_404(Product, token=token)
 
-def cart(request):
+        this_cart = Cart.objects.filter(product=this_product, user=request.user, ordered=False).last()
+
+        if request.method == 'POST':
+            if this_cart:
+                this_cart.num += 1
+                this_cart.save()
+            else:
+                new_cart = Cart.objects.create(user=request.user, product=this_product, num = 1, ordered=False)
+                new_cart.save()
+        messages.success(request, f'محصول {this_product.name} به سبد خرید اضافه شد')
+        return redirect(referer)
+    return redirect('login')
+def cart(request, token):
     if request.method == 'POST':
         this_cart = Cart.objects.filter(id=request.POST['id']).first()
         if request.POST['action'] == 'change':
@@ -105,7 +124,10 @@ def categories(request):
 
 
 def category_products(request, name):
-    category = Category.objects.get(name=name)
+    try:
+        category = Category.objects.get(name=name)
+    except:
+        return redirect('categories')
     products = Product.objects.filter(category=category)
     n = cart_num(request)
     context = {'products': products, 'category': category, 'n': n}

@@ -1,141 +1,276 @@
-{% extends 'master.html' %}
+<!DOCTYPE html>
+{% load humanize %}
 {% load static %}
-{% block title %}
-index page
-{% endblock %}
-{% block header %}
-        <h1>Shop</h1>
-        <p>A Simple Shopping Site</p>
-{% endblock %}
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فروشگاه آنلاین</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <h2>فروشگاه آنلاین</h2>
+                </div>
 
-{% block content %}
+                <nav class="nav-menu" id="navMenu">
+                    <ul>
+                        <li><a href="{% url 'index' %}">خانه</a></li>
+                        <li><a href="{% url 'products' %}">محصولات</a></li>
+                        <li><a href="{% url 'categories' %}">دسته‌بندی</a></li>
+                        <li><a href="#about">درباره ما</a></li>
+                        <li><a href="#contact">تماس</a></li>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'profile' %}">پروفایل</a></li>
+                            <li><a href="{% url 'logout' %}">خروج</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">ورود</a></li>
+                            <li><a href="{% url 'register' %}">ثبت نام</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-
-        <div class="container-fluid">
-            {% if  user.is_authenticated  %}
-            <a class="navbar-brand" href="#">Welcome  {{ user.username }} !</a>
-            {% endif %}
-
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-
-
-                    {% if  user.is_authenticated  %}
-                        <li class="nav-item">
-                        <a href = '/logout' class="nav-link" >Logout</a>
-                        </li>
-
-                    {% else  %}
-                        <li class="nav-item">
-                        <a href =  '{% url 'register' %}' class="nav-link" >Register</a>
-                    </li>
-                        <li class="nav-item">
-                        <a href = '/login' class="nav-link" >Login</a>
-                        </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <a href =  '{% url 'search' %}' class="nav-link" >Search</a>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://github.com/mohamadrezabjr">Contact</a>
-                    </li>
-
-                    </li>
-
-            {% if user.is_authenticated %}
-
-                <li class="nav-item">
-                        <a href = '{% url 'profile' %}' class="nav-link" >Profile</a>
-                        </li>
-                </ul>
-
-                <div class="cart-container">
-                    <a href = '{% url 'cart' %}' style="text-decoration: none">
-                    <i class="bi bi-cart cart-icon"></i>
-                    <img src = "{% static 'images/cart.png' %}" alt="Cart" class="cart-icon">
-                    <span class="cart-count"> {{ n }}
-                    </span>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <form method="GET" action="{% url 'search' %}">
+                            <input type="text" name="q" placeholder="جستجو کنید..." id="searchInput" value="{{ request.GET.q }}">
+                            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+                        </form>
+                    </div>
+                    <a href="{% url 'cart' %}" class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">{{ n }}</span>
                     </a>
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
                 </div>
-            {% endif %}
             </div>
         </div>
-    </nav>
+    </header>
 
-
-    <section class="container py-5">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100 text-center">
-                    <a href="{% url 'categories' %}" class="text-decoration-none">
-                    <div class="card-body">
-                         <h3 class="card-title">Categories</h3>
-                        <p class="card-text"></p>
-                    </div></a>
-                </div>
-
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100 text-center">
-                    <a href="{% url 'all_products' %}" class="text-decoration-none">
-                    <div class="card-body">
-                         <h3 class="card-title">All Products</h3>
-                        <p class="card-text">See our exciting products!</p>
-                    </div></a>
-                </div>
-
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100 text-center">
-                    <a href="{% url 'search' %}" class="text-decoration-none">
-                    <div class="card-body">
-                         <h3 class="card-title">Search</h3>
-                        <p class="card-text"></p>
-                    </div></a>
-                </div>
-
-            </div>
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>بهترین محصولات را از ما بخرید</h1>
+            <p>کیفیت بالا، قیمت مناسب و ارسال سریع</p>
+            <button class="cta-button">مشاهده محصولات</button>
         </div>
-
+        <div class="hero-image">
+            <img src="{% static 'images/hero-image.jpg' %}" alt="خرید آنلاین">
+        </div>
     </section>
 
-{#    <section class="container py-5">#}
-{#        <div class="row g-4">#}
-{#            <div class="col-md-4 mx-auto">#}
-{#                <div class="card h-100 text-center">#}
-{#                    <a href="lost/" class="text-decoration-none">#}
-{#                        <div class="card-body">#}
-{#                            <h3 class="card-title">Lost Token</h3>#}
-{#                            <p class="card-text">You can get your token with your username and password.</p>#}
-{#                        </div>#}
-{#                    </a>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{##}
-{##}
-{#    </section>#}
+    <!-- Categories Section -->
+    <section class="categories">
+        <div class="container">
+            <h2 class="section-title">دسته‌بندی محصولات</h2>
+            <div class="categories-grid">
+                {% for category in categories %}
+                <a href="{% url 'category_products' category.name %}" style="text-decoration: none">
+                    <div class="category-card">
+                        <div class="category-icon">
+                            {% if category.icon  %}
+                            <img src = "{{ category.icon.url }}" alt="{{ category.name }}"  class = 'product-image'>
+                            {% endif %}
 
-    <script >
-    document.addEventListener("DOMContentLoaded", function() {
-    var navbarToggler = document.querySelector(".navbar-toggler");
-    var navbarCollapse = document.querySelector(".navbar-collapse");
+                        </div>
+                        <h3>{{ category.name }}</h3>
+                        <p>{{ category.description }}</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
 
-    document.addEventListener("click", function(event) {
-        var isClickInsideNavbar = navbarCollapse.contains(event.target) || navbarToggler.contains(event.target);
+    <!-- Products Section -->
+ <section class="products" id="products">
+        <div class="container">
+            <h2 class="section-title">محصولات پیشنهادی</h2>
+            <div class="products-grid" id="productsGrid">
+                {% for product in products %}
+                <div class="product-card fade-in">
+                    <!-- نشان تخفیف -->
+                    {% if product.discount != 0 %}
+                        <div class="discount-badge">
+                            {{ product.discount }}% تخفیف
+                        </div>
+                    {% endif %}
 
-        if (!isClickInsideNavbar && navbarCollapse.classList.contains("show")) {
-            new bootstrap.Collapse(navbarCollapse).hide();
-        }
-    });
-});
+                    <a href="{% url 'detail' product.token %}">
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                        {% endif %}
+                    </a>
+                    <div class="product0.0-info">
+                        <h3 class="product-title">
+                            <a href="{% url 'detail' product.token %}" style="text-decoration: none; color: inherit;">
+                                {{ product.name }}
+                            </a>
+                        </h3>
 
+                        <!-- قیمت با تخفیف -->
+                        <div class="product-pricing">
+                            {% if product.discount != 0 %}
+                                <div class="price-with-discount">
+                                    <span class="current-price">{{ product.sale_price|intcomma }} تومان </span>
+                                    <span class="original-price">{{ product.price|intcomma }}</span>
+                                </div>
 
+                            {% else %}
+                                <div class="product-price">{{ product.price| intcomma }} تومان </div>
+                            {% endif %}
+                        </div>
 
-    </script>
+                        <div class="product-rating">
+                            <span class="stars">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= product.rating %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            </span>
+                            <span>({{ product.rating }})</span>
+                        </div>
 
-{% endblock %}
+                        <!-- فرم افزودن به سبد خرید با Django -->
+                        <form method="POST" action="{% url 'add_to_cart' product.token %}">
+                            {% csrf_token %}
+                            <button type="submit" class="add-to-cart">
+                                {% if product.discount != 0 %}
+                                    خرید با تخفیف
+                                {% else %}
+                                    افزودن به سبد خرید
+                                {% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% empty %}
+                <p>محصولی یافت نشد.</p>
+                {% endfor %}
+            </div>
+
+            {% if has_more_products %}
+            <div class="load-more">
+                <a href="{% url 'products' %}" class="load-more-btn">مشاهده همه محصولات</a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3>ارسال سریع</h3>
+                    <p>ارسال رایگان برای خریدهای بالای ۵۰۰ هزار تومان</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>ضمانت کیفیت</h3>
+                    <p>تضمین اصالت و کیفیت تمام محصولات</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>پشتیبانی ۲۴/۷</h3>
+                    <p>پشتیبانی آنلاین در تمام ساعات شبانه‌روز</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-undo"></i>
+                    </div>
+                    <h3>بازگشت آسان</h3>
+                    <p>امکان بازگشت کالا تا ۷ روز پس از خرید</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter">
+        <div class="container">
+            <div class="newsletter-content">
+                <h2>از تخفیف‌های ویژه باخبر شوید</h2>
+                <p>ایمیل خود را وارد کنید تا از جدیدترین پیشنهادات مطلع شوید</p>
+                <form class="newsletter-form" method="POST" action="">
+                    {% csrf_token %}
+                    <input type="email" name="email" placeholder="ایمیل شما" required>
+                    <button type="submit">عضویت</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>فروشگاه آنلاین</h3>
+                    <p>بهترین فروشگاه آنلاین برای خرید محصولات دیجیتال و الکترونیکی</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-telegram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>لینک‌های مفید</h4>
+                    <ul>
+                        <li><a href="">درباره ما</a></li>
+                        <li><a href="">تماس با ما</a></li>
+                        <li><a href="">سوالات متداول</a></li>
+                        <li><a href="">شرایط استفاده</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>خدمات مشتریان</h4>
+                    <ul>
+                        <li><a href="">راهنمای خرید</a></li>
+                        <li><a href="">رویه بازگشت کالا</a></li>
+                        <li><a href="">ضمانت‌نامه</a></li>
+                        <li><a href="">پیگیری سفارش</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>تماس با ما</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-phone"></i> ۰۲۱-۱۲۳۴۵۶۷۸</p>
+                        <p><i class="fas fa-envelope"></i> info@shop.com</p>
+                        <p><i class="fas fa-map-marker-alt"></i> تهران، خیابان ولیعصر</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; ۲۰۲۴ فروشگاه آنلاین. تمام حقوق محفوظ است.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    showNotification('{{ message }}');
+                });
+            </script>
+        {% endfor %}
+    {% endif %}
+
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>
