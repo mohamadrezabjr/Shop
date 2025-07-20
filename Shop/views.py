@@ -154,18 +154,24 @@ def add_to_cart(request, token):
             quantity = None
         this_cart = Cart.objects.filter(product=this_product, user=request.user, ordered=False).last()
 
+        if this_product.stock == 0 :
+            messages.error(request, 'موجودی این محصول تمام شده است . ')
+            return redirect(referer)
+
         if request.method == 'POST':
             if this_cart:
                 if quantity :
                     if quantity <= this_product.stock:
                         this_cart.num = quantity
                         this_cart.save()
+                        messages.success(request, f'محصول {this_product.name} به سبد خرید اضافه شد')
                     else:
-                        messages.error(request, f'عدد است !{this_product.stock}موجودی این محصول کم تنها ')
+                        messages.error(request, f' موجودی این محصول تنها {this_product.stock} عدد است ')
                 else:
                     if this_cart.num < this_product.stock:
                         this_cart.num += 1
                         this_cart.save()
+                        messages.success(request, f'محصول {this_product.name} به سبد خرید اضافه شد')
                     else:
                         messages.error(request, f' موجودی این محصول تنها {this_product.stock} عدد است ')
 
@@ -174,15 +180,17 @@ def add_to_cart(request, token):
                     if quantity <= this_product.stock:
                         new_cart = Cart.objects.create(user=request.user, product=this_product, num = quantity, ordered=False)
                         new_cart.save()
+                        messages.success(request, f'محصول {this_product.name} به سبد خرید اضافه شد')
                     else :
-                        messages.error(request, f'عدد است !{this_product.stock}موجودی این محصول  تنها ')
+                        messages.error(request, f' موجودی این محصول تنها {this_product.stock} عدد است ')
                 else:
                     if this_product.stock != 0:
                         new_cart = Cart.objects.create(user=request.user, product=this_product, num = 1, ordered=False)
                         new_cart.save()
+                        messages.success(request, f'محصول {this_product.name} به سبد خرید اضافه شد')
                     else:
-                        messages.error(request, 'موجودی تمام شده است ! ')
-        messages.success(request, f'محصول {this_product.name} به سبد خرید اضافه شد')
+                        messages.error(request, 'موجودی تمام شده است . ')
+
         return redirect(referer)
     return redirect('login')
 def cart(request, token):
