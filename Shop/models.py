@@ -21,6 +21,8 @@ class Category(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=100)
     price = models.IntegerField()
+    date = models.DateTimeField(auto_now_add=True)
+    stock = models.IntegerField(default=5)
     condition = models.BooleanField(default=True)
     image = models.ImageField(default='images/no_image.jpg',null=True, blank=True)
     description = models.TextField(null=True, blank=True)

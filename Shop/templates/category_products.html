@@ -5,9 +5,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لیست محصولات - فروشگاه آنلاین</title>
+    <title>{{ category.name }} - فروشگاه آنلاین</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/products.css' %}">
+    <link rel="stylesheet" href="{% static 'css/category.css' %}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -22,8 +23,8 @@
                 <nav class="nav-menu" id="navMenu">
                     <ul>
                         <li><a href="{% url 'index' %}">خانه</a></li>
-                        <li><a href="{% url 'products' %}" class="active">محصولات</a></li>
-                        <li><a href="{% url 'categories' %}">دسته‌بندی</a></li>
+                        <li><a href="{% url 'products' %}">محصولات</a></li>
+                        <li><a href="{% url 'categories' %}" class="active">دسته‌بندی</a></li>
                         <li><a href="#about">درباره ما</a></li>
                         <li><a href="#contact">تماس</a></li>
                         {% if user.is_authenticated %}
@@ -61,18 +62,62 @@
             <nav class="breadcrumb-nav">
                 <a href="{% url 'index' %}">خانه</a>
                 <span>/</span>
-                {% if current_category %}
-                    <a href="{% url 'products' %}">محصولات</a>
-                    <span>/</span>
-                    <span>{{ current_category.name }}</span>
-                {% else %}
-                    <span>محصولات</span>
-                {% endif %}
+                <a href="{% url 'categories' %}">دسته‌بندی‌ها</a>
+                <span>/</span>
+                <span>{{ category.name }}</span>
             </nav>
         </div>
     </section>
 
-    <!-- Products Page -->
+    <!-- Category Header -->
+    <section class="category-header">
+        <div class="container">
+            <div class="category-info">
+                <div class="category-details">
+                    <div class="category-icon">
+                        <i class="{{ category.icon }}"></i>
+                    </div>
+                    <div class="category-text">
+                        <h1>{{ category.name }}</h1>
+                        <p>{{ category.description }}</p>
+                        <div class="category-stats">
+                            <span><i class="fas fa-box"></i> {{ products.paginator.count }} محصول</span>
+                            {% if category.subcategories.exists %}
+                                <span><i class="fas fa-layer-group"></i> {{ category.subcategories.count }} زیردسته</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% if category.image %}
+                <div class="category-image">
+                    <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Subcategories -->
+    {% if subcategories %}
+    <section class="subcategories">
+        <div class="container">
+            <h2>زیردسته‌های {{ category.name }}</h2>
+            <div class="subcategories-grid">
+                {% for subcategory in subcategories %}
+                <a href="{% url 'category_products' subcategory.name %}" class="subcategory-card">
+                    <div class="subcategory-icon">
+                        <i class="{{ subcategory.icon }}"></i>
+                    </div>
+                    <h3>{{ subcategory.name }}</h3>
+                    <p>{{ subcategory.product_count }} محصول</p>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Products Section -->
     <section class="products-page">
         <div class="container">
             <div class="products-layout">
@@ -83,27 +128,29 @@
                         <button class="clear-filters" onclick="clearAllFilters()">پاک کردن همه</button>
                     </div>
 
-                    <form method="GET" action="{% url 'products' %}" id="filtersForm">
+                    <form method="GET" action="{% url 'category_products' category.name %}" id="filtersForm">
                         <!-- Search Filter -->
                         <div class="filter-group">
-                            <h4>جستجو</h4>
+                            <h4>جستجو در {{ category.name }}</h4>
                             <input type="text" name="search" placeholder="نام محصول..." value="{{ request.GET.search }}">
                         </div>
 
-                        <!-- Category Filter -->
+                        <!-- Subcategory Filter -->
+                        {% if subcategories %}
                         <div class="filter-group">
-                            <h4>دسته‌بندی</h4>
+                            <h4>زیردسته‌ها</h4>
                             <div class="filter-options">
-                                {% for category in categories %}
+                                {% for subcategory in subcategories %}
                                 <label class="filter-option">
-                                    <input type="checkbox" name="category" value="{{ category.id }}"
-                                           {% if category.id|stringformat:"s" in selected_categories %}checked{% endif %}>
-                                    <span>{{ category.name }}</span>
-                                    <small>({{ category.product_count }})</small>
+                                    <input type="checkbox" name="subcategory" value="{{ subcategory.id }}"
+                                           {% if subcategory.id|stringformat:"s" in selected_subcategories %}checked{% endif %}>
+                                    <span>{{ subcategory.name }}</span>
+                                    <small>({{ subcategory.product_count }})</small>
                                 </label>
                                 {% endfor %}
                             </div>
                         </div>
+                        {% endif %}
 
                         <!-- Price Range Filter -->
                         <div class="filter-group">
@@ -120,6 +167,23 @@
                                 <button type="button" onclick="setPriceRange(1000000, 0)">بالای 1 میلیون</button>
                             </div>
                         </div>
+
+                        <!-- Brand Filter (if applicable) -->
+                        {% if brands %}
+                        <div class="filter-group">
+                            <h4>برند</h4>
+                            <div class="filter-options">
+                                {% for brand in brands %}
+                                <label class="filter-option">
+                                    <input type="checkbox" name="brand" value="{{ brand.id }}"
+                                           {% if brand.id|stringformat:"s" in selected_brands %}checked{% endif %}>
+                                    <span>{{ brand.name }}</span>
+                                    <small>({{ brand.product_count }})</small>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
 
                         <!-- Discount Filter -->
                         <div class="filter-group">
@@ -150,6 +214,16 @@
                             </div>
                         </div>
 
+                        <!-- Availability Filter -->
+                        <div class="filter-group">
+                            <h4>موجودی</h4>
+                            <label class="filter-option">
+                                <input type="checkbox" name="in_stock" value="1"
+                                       {% if request.GET.in_stock %}checked{% endif %}>
+                                <span>فقط کالاهای موجود</span>
+                            </label>
+                        </div>
+
                         <button type="submit" class="apply-filters">اعمال فیلترها</button>
                     </form>
                 </aside>
@@ -159,13 +233,7 @@
                     <!-- Products Header -->
                     <div class="products-header">
                         <div class="products-info">
-                            <h1>
-                                {% if current_category %}
-                                    {{ current_category.name }}
-                                {% else %}
-                                    همه محصولات
-                                {% endif %}
-                            </h1>
+                            <h2>محصولات {{ category.name }}</h2>
                             <p>{{ products.paginator.count }} محصول یافت شد</p>
                         </div>
 
@@ -219,7 +287,7 @@
                             {% for product in products %}
                             <div class="product-card fade-in">
                                 <!-- نشان تخفیف -->
-                                {% if product.discount != 0%}
+                                {% if product.discount != 0 %}
                                     <div class="discount-badge">
                                         {{ product.discount }}% تخفیف
                                     </div>
@@ -243,7 +311,6 @@
                                             {{ product.category.name }}
                                         </a>
                                     </div>
-
                     <!-- Stock Status -->
                     <div class="stock-status">
                         {% if product.stock > 0 %}
@@ -258,7 +325,6 @@
                             </span>
                         {% endif %}
                     </div>
-
                                     <!-- قیمت با تخفیف -->
                                     <div class="product-pricing">
                                         {% if product.discount != 0 %}
@@ -266,13 +332,11 @@
                                                 <span class="current-price">{{ product.sale_price|intcomma }} تومان </span>
                                                 <span class="original-price">{{ product.price|intcomma }}</span>
                                             </div>
-{#                                            <div class="discount-amount">#}
-{#                                                صرفه‌جویی {{ product.discount_amount|price_format }} تومان#}
-{#                                            </div>#}
                                         {% else %}
                                             <div class="product-price">{{ product.price|intcomma }} تومان </div>
                                         {% endif %}
                                     </div>
+
 
                                     <div class="product-rating">
                                         <span class="stars">
@@ -314,9 +378,12 @@
                             <div class="no-products-icon">
                                 <i class="fas fa-search"></i>
                             </div>
-                            <h3>محصولی یافت نشد</h3>
-                            <p>متأسفانه محصولی با این مشخصات پیدا نکردیم.</p>
-                            <button onclick="clearAllFilters()" class="clear-filters-btn">پاک کردن فیلترها</button>
+                            <h3>محصولی در این دسته یافت نشد</h3>
+                            <p>متأسفانه محصولی در دسته {{ category.name }} با این مشخصات پیدا نکردیم.</p>
+                            <div class="no-products-actions">
+                                <button onclick="clearAllFilters()" class="clear-filters-btn">پاک کردن فیلترها</button>
+                                <a href="{% url 'products' %}" class="browse-all-btn">مشاهده همه محصولات</a>
+                            </div>
                         </div>
                         {% endif %}
                     </div>
@@ -357,6 +424,26 @@
         </div>
     </section>
 
+    <!-- Related Categories -->
+    {% if related_categories %}
+    <section class="related-categories">
+        <div class="container">
+            <h2>دسته‌های مرتبط</h2>
+            <div class="related-categories-grid">
+                {% for related_category in related_categories %}
+                <a href="{% url 'category_products' related_category.name %}" class="related-category-card">
+                    <div class="related-category-icon">
+                        <i class="{{ related_category.icon }}"></i>
+                    </div>
+                    <h3>{{ related_category.name }}</h3>
+                    <p>{{ related_category.product_count }} محصول</p>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
     <!-- Mobile Filters Overlay -->
     <div class="mobile-filters-overlay" id="mobileFiltersOverlay">
         <div class="mobile-filters-content">
@@ -381,5 +468,6 @@
 
     <script src="{% static 'js/script.js' %}"></script>
     <script src="{% static 'js/products.js' %}"></script>
+    <script src="{% static 'js/category.js' %}"></script>
 </body>
 </html>

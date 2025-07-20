@@ -1,3 +1,4 @@
+from django.contrib.staticfiles.views import serve
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.contrib.auth import authenticate, logout, login
@@ -46,8 +47,73 @@ def index(request):
 
 def products(request):
     n = cart_num(request)
-    products = Product.objects.all()
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    has_discount = request.GET.get('has_discount')
+    search = request.GET.get('search')
+
+    if not min_price :
+        min_price = 0
+    if not max_price :
+        max_price = 9999999999999999
+    sort = request.GET.get('sort')
+    products = Product.objects.filter(price__gte=min_price, price__lte=max_price)
+    if has_discount :
+        products =products.filter(discount__gt= 0)
+    if search :
+        products = products.filter(name__icontains=search)
     return render(request, 'products.html', {'products': products, 'n': n})
+
+
+def categories(request):
+    category = Category.objects.all()
+    n = cart_num(request)
+    context = {'category': category, 'n': n}
+    return render(request, 'categories.html', context)
+
+
+def category_products(request, name):
+    category = Category.objects.filter(name__iexact=name).first()
+    if not category:
+        return redirect('categories')
+
+    products = Product.objects.filter(category=category)
+
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    has_discount = request.GET.get('has_discount')
+    search = request.GET.get('search')
+    sort = request.GET.get('sort')
+    in_stock = request.GET.get('in_stock')
+
+    if not min_price :
+        min_price = 0
+    if not max_price :
+        max_price = 9999999999999999
+    products = products.filter(price__gte=min_price, price__lte=max_price)
+
+    if search :
+        products = products.filter(name__icontains=search)
+
+
+    if has_discount :
+        products =products.filter(discount__gt= 0)
+
+    if in_stock :
+        products = products.filter(stock__gte=1)
+
+    # Sorting
+    if sort == "price_high" :
+        products = products.order_by('price')
+    elif sort == "price_low":
+        products = products.order_by('-price')
+    elif sort == "newest" :
+        products = products.order_by('-date')
+    elif sort == "oldest" :
+        products = products.order_by('date')
+    n = cart_num(request)
+    context = {'products': products, 'category': category, 'n': n}
+    return render(request, 'category_products.html', context)
 
 
 def details(request, token):
@@ -74,24 +140,48 @@ def details(request, token):
     this_product = get_object_or_404(Product, token=token)
     n = cart_num(request)
     extra = this_product.extra_details.split('\n')
-    context = {'this_product': this_product, 'n': n,  'extra': extra}
+    context = {'product': this_product, 'n': n,  'extra': extra}
 
-    return render(request, "details.html", context=context)
+    return render(request, "product_detail.html", context=context)
 
 def add_to_cart(request, token):
     if request.user.is_authenticated:
         referer = request.META.get('HTTP_REFERER')
         this_product = get_object_or_404(Product, token=token)
-
+        try:
+            quantity = int(request.POST['quantity'])
+        except:
+            quantity = None
         this_cart = Cart.objects.filter(product=this_product, user=request.user, ordered=False).last()
 
         if request.method == 'POST':
             if this_cart:
-                this_cart.num += 1
-                this_cart.save()
+                if quantity :
+                    if quantity <= this_product.stock:
+                        this_cart.num = quantity
+                        this_cart.save()
+                    else:
+                        messages.error(request, f'عدد است !{this_product.stock}موجودی این محصول کم تنها ')
+                else:
+                    if this_cart.num < this_product.stock:
+                        this_cart.num += 1
+                        this_cart.save()
+                    else:
+                        messages.error(request, f' موجودی این محصول تنها {this_product.stock} عدد است ')
+
             else:
-                new_cart = Cart.objects.create(user=request.user, product=this_product, num = 1, ordered=False)
-                new_cart.save()
+                if quantity:
+                    if quantity <= this_product.stock:
+                        new_cart = Cart.objects.create(user=request.user, product=this_product, num = quantity, ordered=False)
+                        new_cart.save()
+                    else :
+                        messages.error(request, f'عدد است !{this_product.stock}موجودی این محصول  تنها ')
+                else:
+                    if this_product.stock != 0:
+                        new_cart = Cart.objects.create(user=request.user, product=this_product, num = 1, ordered=False)
+                        new_cart.save()
+                    else:
+                        messages.error(request, 'موجودی تمام شده است ! ')
         messages.success(request, f'محصول {this_product.name} به سبد خرید اضافه شد')
         return redirect(referer)
     return redirect('login')
@@ -116,22 +206,6 @@ def cart(request, token):
         return render(request, 'cart.html', context)
 
 
-def categories(request):
-    category = Category.objects.all()
-    n = cart_num(request)
-    context = {'category': category, 'n': n}
-    return render(request, 'categories.html', context)
-
-
-def category_products(request, name):
-    try:
-        category = Category.objects.get(name=name)
-    except:
-        return redirect('categories')
-    products = Product.objects.filter(category=category)
-    n = cart_num(request)
-    context = {'products': products, 'category': category, 'n': n}
-    return render(request, 'products.html', context)
 
 
 def checkout(request):
