@@ -1,4 +1,5 @@
 from django.contrib.staticfiles.views import serve
+from django.db import IntegrityError
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.contrib.auth import authenticate, logout, login
@@ -17,20 +18,22 @@ def cart_num(r):
 
 
 def register(request):
-    form = RegisterForm()
     if request.method == "POST":
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=password)
-            login(request, user)
-
-            return redirect('index')
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get("last_name")
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password1")
+        try:
+            user = User.objects.create_user(username=username, email=email, first_name=first_name, last_name=last_name)
+            user.set_password(password)
+            user.save()
+        except IntegrityError:
+            messages.error(request, "نام کاربری قبلا انتخاب شده است")
         else:
-            return redirect('register')
-    return render(request, 'registration/register.html', {'form': form})
+            messages.success(request, "ثبت نام با موفقبت انجام شد")
+
+    return render(request, 'registration/register.html',)
 
 
 def logout_view(request):
@@ -51,17 +54,29 @@ def products(request):
     max_price = request.GET.get('max_price')
     has_discount = request.GET.get('has_discount')
     search = request.GET.get('search')
+    sort = request.GET.get('sort')
 
     if not min_price :
         min_price = 0
     if not max_price :
-        max_price = 9999999999999999
-    sort = request.GET.get('sort')
-    products = Product.objects.filter(price__gte=min_price, price__lte=max_price)
+        max_price = 999999999999999
+
+    products = Product.objects.filter(Q(price__gte=min_price, price__lte=max_price)| Q(sale_price__gte=min_price, sale_price__lte=max_price))
+
     if has_discount :
         products =products.filter(discount__gt= 0)
     if search :
         products = products.filter(name__icontains=search)
+
+    # Sorting
+    if sort == "price_high" :
+        products = products.order_by('-sale_price')
+    elif sort == "price_low":
+        products = products.order_by('sale_price')
+    elif sort == "newest" :
+        products = products.order_by('-date')
+    elif sort == "oldest" :
+        products = products.order_by('date')
     return render(request, 'products.html', {'products': products, 'n': n})
 
 
@@ -90,11 +105,10 @@ def category_products(request, name):
         min_price = 0
     if not max_price :
         max_price = 9999999999999999
-    products = products.filter(price__gte=min_price, price__lte=max_price)
+    products = products.filter(Q(price__gte=min_price, price__lte=max_price) | Q(sale_price__gte=min_price, sale_price__lte=max_price))
 
     if search :
         products = products.filter(name__icontains=search)
-
 
     if has_discount :
         products =products.filter(discount__gt= 0)
@@ -104,9 +118,9 @@ def category_products(request, name):
 
     # Sorting
     if sort == "price_high" :
-        products = products.order_by('price')
+        products = products.order_by('-sale_price')
     elif sort == "price_low":
-        products = products.order_by('-price')
+        products = products.order_by('sale_price')
     elif sort == "newest" :
         products = products.order_by('-date')
     elif sort == "oldest" :

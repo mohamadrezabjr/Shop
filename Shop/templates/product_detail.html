@@ -182,7 +182,7 @@
 
                     <!-- Quantity and Add to Cart -->
                     <div class="purchase-section">
-                        <form method="POST" action="{% url 'add_to_cart' product.token %}" class="add-to-cart-form">
+                        <form method="POST" action="{% url 'add_to_cart' token=product.token %}" class="add-to-cart-form">
                             {% csrf_token %}
                             <div class="quantity-selector">
                                 <label for="quantity">تعداد:</label>

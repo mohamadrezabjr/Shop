@@ -114,10 +114,13 @@
                                 <input type="number" name="max_price" placeholder="حداکثر قیمت" value="{{ request.GET.max_price }}">
                             </div>
                             <div class="price-suggestions">
-                                <button type="button" onclick="setPriceRange(0, 100000)">زیر 100 هزار</button>
-                                <button type="button" onclick="setPriceRange(100000, 500000)">100 تا 500 هزار</button>
-                                <button type="button" onclick="setPriceRange(500000, 1000000)">500 هزار تا 1 میلیون</button>
-                                <button type="button" onclick="setPriceRange(1000000, 0)">بالای 1 میلیون</button>
+                                <button type="button" onclick="setPriceRange(0, 1000000)">زیر 1 میلیون</button>
+                                <button type="button" onclick="setPriceRange(1000000, 10000000)">1 تا 10 میلیون</button>
+                                <button type="button" onclick="setPriceRange(10000000, 20000000)">10 میلیون تا 20 میلیون</button>
+                                <button type="button" onclick="setPriceRange(20000000, 50000000)">20 میلیون تا 50 میلیون</button>
+                                <button type="button" onclick="setPriceRange(50000000, 100000000)">50 میلیون تا 100 میلیون</button>
+                                <button type="button" onclick="setPriceRange(100000000, 0)">بالای 100 میلیون</button>
+
                             </div>
                         </div>
 
@@ -285,7 +288,7 @@
 
                                     <div class="product-actions">
                                         <!-- فرم افزودن به سبد خرید -->
-                                        <form method="POST" action="{% url 'add_to_cart' product.token %}" class="add-to-cart-form">
+                                        <form method="POST" action="{% url 'add_to_cart' token=product.token %}" class="add-to-cart-form">
                                             {% csrf_token %}
                                             <button type="submit" class="add-to-cart-btn">
                                                 <i class="fas fa-shopping-cart"></i>

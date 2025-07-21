@@ -21,6 +21,7 @@ class Category(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=100)
     price = models.IntegerField()
+    sale_price = models.IntegerField(auto_created=True, null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)
     stock = models.IntegerField(default=5)
     condition = models.BooleanField(default=True)
@@ -34,10 +35,10 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if not self.token:
             self.token = code_generator()
+
+        self.sale_price = int(self.price - self.price * (self.discount/100))
+
         super().save(*args, **kwargs)
-    @property
-    def sale_price(self):
-        return int(self.price - self.price * (self.discount/100))
 
     def __str__(self):
         return '{} - {}'.format(self.name, self.category)
