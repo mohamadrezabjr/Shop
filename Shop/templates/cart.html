@@ -1,134 +1,406 @@
-{% extends 'master.html' %}
+<!DOCTYPE html>
 {% load static %}
-{% load custom_filters%}
-{% block title %}
-
-    Your Cart
-{% endblock %}
-{% block header %}
-        <h1>Cart</h1>
-        <p></p>
-{% endblock %}
-{% block content %}
-
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-            <a class="navbar-brand" href="#"></a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href={% url "index" %}>Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/products">Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href = '{% url 'profile' %}' class="nav-link" >Profile</a>
-                        </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://github.com/mohamadrezabjr">Contact</a>
-                    </li>
-
-                </ul>
-
-                </a>
-            </div>
-        </div>
-    </nav>
-    <div class="container my-5">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white text-center">
-                <h2>Your Shopping Cart</h2>
-            </div>
-            <div class="card-body">
-                <!-- Shopping Cart Table -->
-                <table class="table table-striped table-hover align-middle">
-
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Product Name</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Total</th>
-                            <th>Remove</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                    {% for x in cart  %}
-                        {% if not x.ordered %}
-                        <tr>
-                            <td>
-                                {% if x.product.image %}
-
-                                <img src="{{ x.product.image.url }}" alt="{{ x.product.name }}" class="rounded me-2" style="width: 50px; height: 50px;">
-                                {% else %}
-                        <img src='{% static "/images/no_image.jpg" %}' class="rounded me-2" alt="{{ x.product.name }}" style="width: 50px; height: 50px;">
-                    {% endif %}
-                                {{x.product.name}}
-                            </td>
-                            <td>${{x.product.price}}</td>
-                            <td>
-                                <form method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="id" value="{{ x.id }}">
-                                 <input type = 'hidden' name = 'action'  value="change">
-                                <input type="number" name="quantity" value="{{ x.num }}" min="1" class="form-control" style="width: 70px; display: inline-block;">
-                                <button type="submit" class="btn btn-primary btn-sm">Update</button>
-                            </form>
-                            </td>
-                            <td>${{ x.num|multiply:x.product.price }}</td>
-                            <td>
-
-                                <form method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name = 'id' value = '{{ x.id }}'>
-                                    <input type = 'hidden' name = 'action'  value="remove">
-                                    <button class="btn btn-danger btn-sm">
-                                    <i class="bi bi-trash"></i> Remove
-                                </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endif %}
-                    {% endfor%}
-
-                    </tbody>
-                </table>
-
-                <!-- Total Amount and Checkout Button -->
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <h4>Total: <span class="fw-bold">${{ total }}</span></h4>
-                    <a href = "{% url 'checkout'%}">
-                    <button class="btn btn-success btn-lg">
-                        <i class="bi bi-bag-check"></i> Checkout
-                    </button>
+{% load humanize %}
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سبد خرید - فروشگاه آنلاین</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <a href="{% url 'index' %}">
+                        <h2>فروشگاه آنلاین</h2>
                     </a>
+                </div>
+
+                <nav class="nav-menu" id="navMenu">
+                    <ul>
+                        <li><a href="{% url 'index' %}">خانه</a></li>
+                        <li><a href="{% url 'products' %}">محصولات</a></li>
+                        <li><a href="{% url 'categories' %}">دسته‌بندی</a></li>
+                        <li><a href="#about">درباره ما</a></li>
+                        <li><a href="#contact">تماس</a></li>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'profile' %}">پروفایل</a></li>
+                            <li><a href="{% url 'logout' %}">خروج</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">ورود</a></li>
+                            <li><a href="{% url 'register' %}">ثبت نام</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+
+                <div class="header-actions">
+                    <div class="search-box">
+                        <form method="GET" action="{% url 'products' %}">
+                            <input type="text" name="search" placeholder="جستجو کنید...">
+                            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+                        </form>
+                    </div>
+                    <a href="{% url 'cart' %}" class="cart-icon active">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">{{ n }}</span>
+                    </a>
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
                 </div>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Bootstrap 5 JS (Optional, for interactivity like modals, dropdowns, etc.) -->
-    <script >
-    document.addEventListener("DOMContentLoaded", function() {
-    var navbarToggler = document.querySelector(".navbar-toggler");
-    var navbarCollapse = document.querySelector(".navbar-collapse");
+    <!-- Breadcrumb -->
+    <section class="breadcrumb">
+        <div class="container">
+            <nav class="breadcrumb-nav">
+                <a href="{% url 'index' %}">خانه</a>
+                <span>/</span>
+                <span>سبد خرید</span>
+            </nav>
+        </div>
+    </section>
 
-    document.addEventListener("click", function(event) {
-        var isClickInsideNavbar = navbarCollapse.contains(event.target) || navbarToggler.contains(event.target);
+    <!-- Cart Section -->
+    <section class="cart-section">
+        <div class="container">
+            {% if cart %}
+            <div class="cart-layout">
+                <!-- Cart Items -->
+                <div class="cart-items">
+                    <div class="cart-header">
+                        <h1>سبد خرید شما</h1>
+                        <p>{{ n }} محصول در سبد خرید</p>
+                    </div>
 
-        if (!isClickInsideNavbar && navbarCollapse.classList.contains("show")) {
-            new bootstrap.Collapse(navbarCollapse).hide();
-        }
-    });
-});
+                    <!-- Cart Items List -->
+                    <div class="items-list">
+                        {% for item in cart %}
+                        <div class="cart-item" data-item-id="{{ item.id }}">
+                            <div class="item-image">
+                                {% if item.product.discount != 0 %}
+                                    <div class="discount-badge">
+                                        {{ item.product.discount }}% تخفیف
+                                    </div>
+                                {% endif %}
+                                <a href="{% url 'detail' token=item.product.token %}">
+                                    {% if item.product.image %}
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                                    {% endif %}
+                                </a>
+                            </div>
 
-    </script>
-{% endblock %}
+                            <div class="item-details">
+                                <div class="item-info">
+                                    <h3 class="item-title">
+                                        <a href="{% url 'detail' token=item.product.token %}">{{ item.product.name }}</a>
+                                    </h3>
+                                    <div class="item-meta">
+                                        <span class="item-category">
+                                            <i class="fas fa-tag"></i>
+                                            {{ item.product.category.name }}
+                                        </span>
+                                        <span class="item-sku">
+                                            <i class="fas fa-barcode"></i>
+                                            کد: {{ item.product.token }}
+                                        </span>
+                                    </div>
+
+                                    <!-- Stock Status -->
+                                    <div class="stock-status">
+                                        {% if item.product.stock >= item.quantity %}
+                                            <span class="in-stock">
+                                                <i class="fas fa-check-circle"></i>
+                                                موجود در انبار
+                                            </span>
+                                        {% else %}
+                                            <span class="low-stock">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                                {% if item.product.stock > 0 %}
+                                                    تنها {{ item.product.stock }} عدد موجود
+                                                {% else %}
+                                                    ناموجود
+                                                {% endif %}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="item-actions">
+                                    <!-- Quantity Controls -->
+                                    <div class="quantity-controls">
+                                        <label>تعداد:</label>
+                                        <div class="quantity-wrapper">
+
+                                            <button type="button" class="quantity-btn decrease" onclick="updateQuantity({{ item.id }}, 'decrease')">-</button>
+                                            <input type="number"
+                                                   class="quantity-input"
+                                                   value="{{ item.num }}"
+                                                   min="1"
+                                                   max="{{ item.product.stock }}"
+                                                   onchange="updateQuantity({{ item.id }}, 'set', this.value)">
+                                            <button type="button" class="quantity-btn increase" onclick="updateQuantity({{ item.id }}, 'increase')">+</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Price -->
+                                    <div class="item-pricing">
+                                        {% if item.product.discount != 0 %}
+                                            <div class="price-with-discount">
+                                                <span class="current-price">{{ item.product.sale_price|intcomma }} تومان</span>
+                                                <span class="original-price">{{ item.product.price|intcomma }} تومان</span>
+                                            </div>
+{#                                            <div class="discount-amount">#}
+{#                                                صرفه‌جویی: {{ item.product.price|add:item.product.sale_price|sub:item.product.sale_price|sub:item.product.sale_price|add:item.product.price|intcomma }} تومان#}
+{#                                            </div>#}
+                                        {% else %}
+                                            <div class="item-price">{{ item.product.price|intcomma }} تومان</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Total Price -->
+                                    <div class="item-total">
+                                        <span class="total-label">جمع:</span>
+                                        <span class="total-price">{{ item.total_price|intcomma }} تومان</span>
+                                    </div>
+
+                                    <!-- Remove Button -->
+                                <form action="{% url 'cart' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item_id" id ='item_id' value="{{ item.id }}">
+                                    <input type="hidden" name = 'action' id ='action' value="remove">
+                                    <button class="remove-item" onclick="removeItem({{ item.id }})">
+
+                                        <i class="fas fa-trash"></i>
+                                        حذف
+                                    </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Cart Actions -->
+                    <div class="cart-actions">
+                        <form action="{% url 'cart' %}" method="POST">
+                            {% csrf_token %}
+                        <input type="hidden" name="action" id = 'action' value="clear">
+                            <button class="clear-cart" onclick="clearCart({{ item.id }})">
+                            <i class="fas fa-trash-alt"></i>
+                            پاک کردن سبد خرید
+                        </button>
+                        </form>
+                        <a href="{% url 'products' %}" class="continue-shopping">
+                            <i class="fas fa-arrow-right"></i>
+                            ادامه خرید
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Cart Summary -->
+                <div class="cart-summary">
+                    <div class="summary-card">
+                        <h3>خلاصه سفارش</h3>
+
+                        <div class="summary-details">
+                            <div class="summary-row">
+                                <span>تعداد کالا:</span>
+                                <span>{{ n }} عدد</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>قیمت کالاها:</span>
+                                <span>{{ subtotal|intcomma }} تومان</span>
+                            </div>
+                            {% if total_discount > 0 %}
+                            <div class="summary-row discount">
+                                <span>تخفیف:</span>
+                                <span>-{{ total_discount|intcomma }} تومان</span>
+                            </div>
+                            {% endif %}
+                            <div class="summary-row">
+                                <span>هزینه ارسال:</span>
+                                {% if subtotal >= 500000 %}
+                                    <span class="free-shipping">رایگان</span>
+                                {% else %}
+                                    <span>{{ shipping_cost|intcomma }} تومان</span>
+                                {% endif %}
+                            </div>
+                            <div class="summary-divider"></div>
+                            <div class="summary-row total">
+                                <span>مبلغ قابل پرداخت:</span>
+                                <span>{{ total_price|intcomma }} تومان</span>
+                            </div>
+                        </div>
+
+                        <!-- Coupon Code -->
+                        <div class="coupon-section">
+                            <h4>کد تخفیف</h4>
+                            <form class="coupon-form" onsubmit="applyCoupon(event)">
+                                <div class="coupon-input">
+                                    <input type="text" name="coupon_code" placeholder="کد تخفیف را وارد کنید" id="couponCode">
+                                    <button type="submit">اعمال</button>
+                                </div>
+                            </form>
+                            {% if applied_coupon %}
+                            <div class="applied-coupon">
+                                <span class="coupon-info">
+                                    <i class="fas fa-check-circle"></i>
+                                    کد تخفیف "{{ applied_coupon.code }}" اعمال شد
+                                </span>
+                                <button class="remove-coupon" onclick="removeCoupon()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Shipping Info -->
+                        <div class="shipping-info">
+                            <div class="shipping-item">
+                                <i class="fas fa-truck"></i>
+                                <div>
+                                    <h4>ارسال رایگان</h4>
+                                    <p>برای خریدهای بالای {{ 500000|intcomma }} تومان</p>
+                                    {% if subtotal < 500000 %}
+                                    <div class="free-shipping-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{ subtotal }}%"></div>
+                                        </div>
+                                        <small>{{ 500000|intcomma }} تومان تا ارسال رایگان</small>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Checkout Button -->
+                        <div class="checkout-section">
+                            <a href="{% url 'checkout' %}" class="checkout-btn">
+                                <i class="fas fa-credit-card"></i>
+                                ادامه فرآیند خرید
+                            </a>
+                            <div class="payment-methods">
+                                <span>روش‌های پرداخت:</span>
+                                <div class="payment-icons">
+                                    <i class="fas fa-credit-card" title="کارت بانکی"></i>
+                                    <i class="fas fa-university" title="درگاه بانکی"></i>
+                                    <i class="fas fa-wallet" title="کیف پول"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trust Badges -->
+                    <div class="trust-badges">
+                        <div class="trust-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>خرید امن</span>
+                        </div>
+                        <div class="trust-item">
+                            <i class="fas fa-undo"></i>
+                            <span>ضمانت بازگشت</span>
+                        </div>
+                        <div class="trust-item">
+                            <i class="fas fa-headset"></i>
+                            <span>پشتیبانی ۲۴/۷</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- Empty Cart -->
+            <div class="empty-cart">
+                <div class="empty-cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <h2>سبد خرید شما خالی است</h2>
+                <p>هنوز محصولی به سبد خرید اضافه نکرده‌اید</p>
+                <div class="empty-cart-actions">
+                    <a href="{% url 'products' %}" class="start-shopping">
+                        <i class="fas fa-shopping-bag"></i>
+                        شروع خرید
+                    </a>
+                    {% if user.is_authenticated %}
+                    <a href="" class="view-wishlist">
+                        <i class="fas fa-heart"></i>
+                        مشاهده علاقه‌مندی‌ها
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Recently Viewed -->
+    {% if recently_viewed %}
+    <section class="recently-viewed">
+        <div class="container">
+            <h2>محصولات اخیراً مشاهده شده</h2>
+            <div class="products-grid">
+                {% for product in recently_viewed %}
+                <div class="product-card">
+                    {% if product.discount != 0 %}
+                        <div class="discount-badge">
+                            {{ product.discount }}% تخفیف
+                        </div>
+                    {% endif %}
+
+                    <a href="{% url 'detail' product.token %}">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                    </a>
+
+                    <div class="product-info">
+                        <h3 class="product-title">
+                            <a href="{% url 'detail' product.token %}">{{ product.name }}</a>
+                        </h3>
+
+                        <div class="product-pricing">
+                            {% if product.discount != 0 %}
+                                <div class="price-with-discount">
+                                    <span class="current-price">{{ product.sale_price|intcomma }}</span>
+                                    <span class="original-price">{{ product.price|intcomma }}</span>
+                                </div>
+                            {% else %}
+                                <div class="product-price">{{ product.price|intcomma }}</div>
+                            {% endif %}
+                        </div>
+
+                        <form method="POST" action="{% url 'add_to_cart' product.token %}" class="quick-add-form">
+                            {% csrf_token %}
+                            <button type="submit" class="quick-add-btn">
+                                <i class="fas fa-plus"></i>
+                                افزودن سریع
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Messages from Django -->
+    {% if messages %}
+        {% for message in messages %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    showNotification('{{ message }}', '{{ message.tags }}');
+                });
+            </script>
+        {% endfor %}
+    {% endif %}
+
+    <script src="{% static 'js/script.js' %}"></script>
+    <script src="{% static 'js/cart.js' %}"></script>
+</body>
+</html>

@@ -119,12 +119,6 @@
   text-align: left;
 }
 
-/* چپ‌چین کردن فیلدهای خاص */
-.input-wrapper input[type="email"],
-.input-wrapper input[name="username"] {
-  direction: ltr;
-  text-align: left;
-}
 
 /* Placeholder styling for LTR fields */
 .input-wrapper input[type="email"]::placeholder,

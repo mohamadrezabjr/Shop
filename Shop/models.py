@@ -1,4 +1,6 @@
 from datetime import datetime
+from itertools import product
+
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.contrib.auth.models import User
@@ -48,8 +50,11 @@ class Cart(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     num = models.IntegerField(default=1)
+    total_price = models.IntegerField(null=True, blank=True)
     ordered = models.BooleanField(default=False)
-
+    def save(self, *args, **kwargs):
+        self.total_price = self.product.sale_price * self.num
+        super().save(*args, **kwargs)
     def __str__(self):
         return (f"{self.num} of {self.product.name} for {self.user.username} ")
 

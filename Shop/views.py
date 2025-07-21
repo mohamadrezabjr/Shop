@@ -1,11 +1,13 @@
 from django.contrib.staticfiles.views import serve
 from django.db import IntegrityError
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.contrib.auth import authenticate, logout, login
 from django.shortcuts import render, redirect
 from .models import *
 from django.contrib import messages
+import json
 from .forms import *
 
 def cart_num(r):
@@ -32,6 +34,9 @@ def register(request):
             messages.error(request, "نام کاربری قبلا انتخاب شده است")
         else:
             messages.success(request, "ثبت نام با موفقبت انجام شد")
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            return redirect("index")
 
     return render(request, 'registration/register.html',)
 
@@ -207,25 +212,82 @@ def add_to_cart(request, token):
 
         return redirect(referer)
     return redirect('login')
-def cart(request, token):
-    if request.method == 'POST':
-        this_cart = Cart.objects.filter(id=request.POST['id']).first()
-        if request.POST['action'] == 'change':
-            this_cart.num = request.POST['quantity']
-            this_cart.save()
-        elif request.POST['action'] == 'remove':
-            this_cart.delete()
-        return redirect('cart')
-
+def calculate_cart_total(request):
+    cart = Cart.objects.filter(user=request.user, ordered=False)
+    # price with discount
     total = 0
+    # price without discount
+    subtotal = 0
+    for item in cart:
+        subtotal += item.product.price * item.num
+        total += item.total_price
 
+    shipping_price = 50000
+    return {
+        'subtotal': int(subtotal),
+        'shipping': int(shipping_price),
+        'total': int(total)
+    }
+
+def cart(request):
     if request.user.is_authenticated:
-        cart = Cart.objects.filter(user=request.user, ordered=False)
-        for x in cart:
-            total += x.num * x.product.price
 
-        context = {'cart': cart, 'total': total, }
+        cart_totals = calculate_cart_total(request)
+
+        if request.method == 'POST':
+            try:
+                action = request.POST['action']
+            except:
+                action = None
+
+            if action == 'clear':
+                cart_items = Cart.objects.filter(user=request.user, ordered=False)
+                for cart_item in cart_items:
+                    cart_item.delete()
+
+            elif action == 'remove':
+                this_cart = Cart.objects.filter(id= request.POST['item_id'])
+                this_cart.delete()
+            else:
+                data = json.loads(request.body)
+                item_id = data.get('item_id')
+                quantity = int(data.get('quantity', 1))
+                try:
+                    cart_item = Cart.objects.filter(id=item_id).first()
+                except:
+                    return redirect('cart')
+                if quantity > cart_item.product.stock:
+                    return JsonResponse({
+                        'success': False,
+                        'message': f'حداکثر موجودی این محصول {cart_item.product.stock} عدد است'
+                    })
+
+                if quantity < 1:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'تعداد باید حداقل 1 باشد'
+                    })
+
+                # به‌روزرسانی تعداد
+                cart_item.num = quantity
+                cart_item.save()
+
+                return JsonResponse({
+                    'success': True,
+                    'message': 'تعداد محصول به‌روزرسانی شد',
+                    'cart_totals': cart_totals,
+                    'n' : cart_num(request)
+                })
+
+        cart = Cart.objects.filter(user=request.user, ordered=False)
+
+        n = cart_num(request)
+        subtotal = cart_totals['subtotal']
+        total = cart_totals['total']
+
+        context = {'cart': cart, 'total_price': total, 'n': n, 'subtotal': subtotal, }
         return render(request, 'cart.html', context)
+    return redirect('login')
 
 
 

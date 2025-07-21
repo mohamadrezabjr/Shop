@@ -127,13 +127,13 @@ body {
 
 .hero-content {
   flex: 1;
-  max-width: 500px;
+  max-width: 1000px;
 }
 
 .hero-content h1 {
   font-size: 3rem;
   margin-bottom: 1rem;
-  line-height: 1.2;
+  line-height: 1.5;
 }
 
 .hero-content p {
