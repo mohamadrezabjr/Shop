@@ -1,125 +1,544 @@
-{% extends 'master.html' %}
-{% load custom_filters%}
+<!DOCTYPE html>
 {% load static %}
-{% block title %}
-Products
-{% endblock %}
-{% block header %}
-    <h1>Checkout</h1>
-
-        {% endblock %}
-{% block content %}
-
-
-
-
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a href = '{% url 'index' %}' class="nav-link" >Home</a>
-                    </li>
-                    {% if  user.is_authenticated  %}
-                        <li class="nav-item">
-                        <a href = '/logout' class="nav-link" >Logout</a>
-                        </li>
-                    {% else  %}
-                        <li class="nav-item">
-                        <a href =  '{% url 'register' %}' class="nav-link" >Register</a>
-                    </li>
-                        <li class="nav-item">
-                        <a href = '/login' class="nav-link" >Login</a>
-                        </li>
-                    {% endif %}
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://github.com/mohamadrezabjr">Contact</a>
-                    </li>
-                </ul>
-                {% if user.is_authenticated %}
-                <div class="cart-container">
-                    <a href = '{% url 'cart' %}' style="text-decoration: none">
-                    <i class="bi bi-cart cart-icon"></i>
-                    <img src = "{% static 'images/cart.png' %}" alt="Cart" class="cart-icon">
-                    <span class="cart-count"> {{ n }}
-                    </span>
+{% load humanize %}
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تکمیل سفارش - فروشگاه آنلاین</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <a href="{% url 'index' %}">
+                        <h2>فروشگاه آنلاین</h2>
                     </a>
                 </div>
-                {% endif %}
+
+                <nav class="nav-menu" id="navMenu">
+                    <ul>
+                        <li><a href="{% url 'index' %}">خانه</a></li>
+                        <li><a href="{% url 'products' %}">محصولات</a></li>
+                        <li><a href="{% url 'categories' %}">دسته‌بندی</a></li>
+                        <li><a href="#about">درباره ما</a></li>
+                        <li><a href="#contact">تماس</a></li>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'profile' %}">پروفایل</a></li>
+                            <li><a href="{% url 'logout' %}">خروج</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">ورود</a></li>
+                            <li><a href="{% url 'register' %}">ثبت نام</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+
+                <div class="header-actions">
+                    <div class="search-box">
+                        <form method="GET" action="{% url 'products' %}">
+                            <input type="text" name="search" placeholder="جستجو کنید...">
+                            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+                        </form>
+                    </div>
+                    <a href="{% url 'cart' %}" class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">{{ cart_count|default:0 }}</span>
+                    </a>
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
             </div>
         </div>
-    </nav>
+    </header>
 
+    <!-- Breadcrumb -->
+    <section class="breadcrumb">
+        <div class="container">
+            <nav class="breadcrumb-nav">
+                <a href="{% url 'index' %}">خانه</a>
+                <span>/</span>
+                <a href="{% url 'cart' %}">سبد خرید</a>
+                <span>/</span>
+                <span>تکمیل سفارش</span>
+            </nav>
+        </div>
+    </section>
 
-
-    <section class="container py-5">
-        <div class="row">
-            <div class="col-md-8">
-                <h2>Billing Details</h2>
-                <form method="POST" >
-                    {% csrf_token %}
-
-                    <div class="mb-3">
-                        <label for="city" class="form-label">City</label>
-                        <input type="text" class="form-control" id="city" name="city" required>
+    <!-- Checkout Progress -->
+    <section class="checkout-progress">
+        <div class="container">
+            <div class="progress-steps">
+                <div class="step completed">
+                    <div class="step-icon">
+                        <i class="fas fa-shopping-cart"></i>
                     </div>
-                    <div class="mb-3">
-                        <label for="address" class="form-label">Address</label>
-                        <input type="text" class="form-control" id="address" name="address" required>
+                    <span>سبد خرید</span>
+                </div>
+                <div class="step active">
+                    <div class="step-icon">
+                        <i class="fas fa-user"></i>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="zip" class="form-label">Number</label>
-                        <input type="text" class="form-control" id="number" name="number" required>
+                    <span>اطلاعات</span>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-credit-card"></i>
                     </div>
-                    <button type="submit" class="btn btn-primary">Place Order</button>
-                </form>
-            </div>
-
-            <div class="col-md-4">
-                <h2>Order Summary</h2>
-                <ul class="list-group mb-3">
-                    {% for item in products %}
-                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                {% if item.product.image %}
-
-                                <img src="{{ item.product.image.url }}" alt="{{ x.product.name }}" class="rounded me-2" style="width: 50px; height: 50px; margin-right: 10px;">
-                                {% else %}
-                        <img src='{% static "/images/no_image.jpg" %}' class="rounded me-2" alt="{{ x.product.name }}" style="width: 50px; height: 50px; margin-right: 10px;">
-                    {% endif %}
-                                <span>{{ item.product.name }} (x{{ item.num }})</span>
-                            </div>
-                            <strong>${{ item.num|multiply:item.product.price }}</strong>
-                        </li>
-                    {% endfor %}
-                    <li class="list-group-item d-flex justify-content-between bg-light">
-                        <strong>Total</strong>
-                        <strong>${{ total }}</strong>
-                    </li>
-                </ul>
+                    <span>پرداخت</span>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <span>تأیید</span>
+                </div>
             </div>
         </div>
     </section>
 
-    <script >
-    document.addEventListener("DOMContentLoaded", function() {
-    var navbarToggler = document.querySelector(".navbar-toggler");
-    var navbarCollapse = document.querySelector(".navbar-collapse");
+    <!-- Checkout Section -->
+    <section class="checkout-section">
+        <div class="container">
+            <div class="checkout-layout">
+                <!-- Checkout Form -->
+                <div class="checkout-form">
+                    <form method="POST" id="checkoutForm">
+                        {% csrf_token %}
+                        
+                        <!-- Personal Information -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <h2>
+                                    <i class="fas fa-user"></i>
+                                    اطلاعات شخصی
+                                </h2>
+                                {% if not user.is_authenticated %}
+                                <p class="login-suggestion">
+                                    حساب کاربری دارید؟ 
+                                    <a href="{% url 'login' %}?next={% url 'checkout' %}">وارد شوید</a>
+                                </p>
+                                {% endif %}
+                            </div>
 
-    document.addEventListener("click", function(event) {
-        var isClickInsideNavbar = navbarCollapse.contains(event.target) || navbarToggler.contains(event.target);
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="first_name">نام *</label>
+                                    <input type="text" 
+                                           name="first_name" 
+                                           id="first_name" 
+                                           value="{% if user.is_authenticated %}{{ user.first_name }}{% endif %}"
+                                           required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="last_name">نام خانوادگی *</label>
+                                    <input type="text" 
+                                           name="last_name" 
+                                           id="last_name" 
+                                           value="{% if user.is_authenticated %}{{ user.last_name }}{% endif %}"
+                                           required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">ایمیل *</label>
+                                    <input type="email" 
+                                           name="email" 
+                                           id="email" 
+                                           value="{% if user.is_authenticated %}{{ user.email }}{% endif %}"
+                                           required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone">شماره موبایل *</label>
+                                    <input type="tel" 
+                                           name="phone" 
+                                           id="phone" 
+                                           placeholder="09123456789"
+                                           pattern="09[0-9]{9}"
+                                           required>
+                                </div>
+                            </div>
+                        </div>
 
-        if (!isClickInsideNavbar && navbarCollapse.classList.contains("show")) {
-            new bootstrap.Collapse(navbarCollapse).hide();
-        }
-    });
-});
+                        <!-- Shipping Address -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <h2>
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    آدرس تحویل
+                                </h2>
+                                {% if user.is_authenticated and user_addresses %}
+                                <button type="button" class="select-address-btn" onclick="showAddressModal()">
+                                    <i class="fas fa-list"></i>
+                                    انتخاب از آدرس‌های ذخیره شده
+                                </button>
+                                {% endif %}
+                            </div>
 
-    </script>
-{% endblock %}
+                            <div class="form-grid">
+
+                                <div class="form-group full-width">
+                                    <label for="city">شهر *</label>
+                                <input type="text"
+                                           name="city"
+                                           id="city"
+                                           placeholder="شهر خود را وارد کنید"
+                                           required>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="address">آدرس کامل *</label>
+                                    <textarea name="address" 
+                                              id="address" 
+                                              rows="3" 
+                                              placeholder="آدرس کامل خود را وارد کنید..."
+                                              required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="postal_code">کد پستی *</label>
+                                    <input type="text" 
+                                           name="postal_code" 
+                                           id="postal_code" 
+                                           placeholder="1234567890"
+                                           pattern="[0-9]{10}"
+                                           maxlength="10"
+                                           required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="unit">واحد</label>
+                                    <input type="text" 
+                                           name="unit" 
+                                           id="unit" 
+                                           placeholder="شماره واحد">
+                                </div>
+                            </div>
+
+                            <!-- Save Address Option -->
+                            {% if user.is_authenticated %}
+                            <div class="form-options">
+                                <label class="checkbox-wrapper">
+                                    <input type="checkbox" name="save_address" id="save_address">
+                                    <span class="checkmark"></span>
+                                    ذخیره این آدرس برای خریدهای بعدی
+                                </label>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Shipping Method -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <h2>
+                                    <i class="fas fa-truck"></i>
+                                    روش ارسال
+                                </h2>
+                            </div>
+
+                            <div class="shipping-methods">
+                                <div class="shipping-option">
+                                    <label class="radio-wrapper">
+                                        <input type="radio" name="shipping_method" value="standard" checked>
+                                        <span class="radio-mark"></span>
+                                        <div class="shipping-info">
+                                            <div class="shipping-title">
+                                                <span>ارسال عادی</span>
+                                                <span class="shipping-price">
+                                                    {% if subtotal >= 500000 %}
+                                                        رایگان
+                                                    {% else %}
+                                                        {{ 30000|intcomma }} تومان
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            <div class="shipping-desc">2 تا 4 روز کاری</div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="shipping-option">
+                                    <label class="radio-wrapper">
+                                        <input type="radio" name="shipping_method" value="express">
+                                        <span class="radio-mark"></span>
+                                        <div class="shipping-info">
+                                            <div class="shipping-title">
+                                                <span>ارسال فوری</span>
+                                                <span class="shipping-price">{{ 50000|intcomma }} تومان</span>
+                                            </div>
+                                            <div class="shipping-desc">1 روز کاری (فقط تهران)</div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="shipping-option">
+                                    <label class="radio-wrapper">
+                                        <input type="radio" name="shipping_method" value="pickup">
+                                        <span class="radio-mark"></span>
+                                        <div class="shipping-info">
+                                            <div class="shipping-title">
+                                                <span>تحویل حضوری</span>
+                                                <span class="shipping-price">رایگان</span>
+                                            </div>
+                                            <div class="shipping-desc">از فروشگاه تحویل بگیرید</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <h2>
+                                    <i class="fas fa-credit-card"></i>
+                                    روش پرداخت
+                                </h2>
+                            </div>
+
+                            <div class="payment-methods">
+                                <div class="payment-option">
+                                    <label class="radio-wrapper">
+                                        <input type="radio" name="payment_method" value="online" checked>
+                                        <span class="radio-mark"></span>
+                                        <div class="payment-info">
+                                            <div class="payment-title">
+                                                <i class="fas fa-credit-card"></i>
+                                                <span>پرداخت آنلاین</span>
+                                            </div>
+                                            <div class="payment-desc">پرداخت امن با کارت بانکی</div>
+                                            <div class="payment-icons">
+                                                <i class="fab fa-cc-visa"></i>
+                                                <i class="fab fa-cc-mastercard"></i>
+                                                <i class="fas fa-university"></i>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="payment-option">
+                                    <label class="radio-wrapper">
+                                        <input type="radio" name="payment_method" value="cod">
+                                        <span class="radio-mark"></span>
+                                        <div class="payment-info">
+                                            <div class="payment-title">
+                                                <i class="fas fa-money-bill-wave"></i>
+                                                <span>پرداخت در محل</span>
+                                            </div>
+                                            <div class="payment-desc">پرداخت هنگام تحویل کالا</div>
+                                            <div class="payment-note">
+                                                <i class="fas fa-info-circle"></i>
+                                                هزینه اضافی: {{ 10000|intcomma }} تومان
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="payment-option">
+                                    <label class="radio-wrapper">
+                                        <input type="radio" name="payment_method" value="wallet">
+                                        <span class="radio-mark"></span>
+                                        <div class="payment-info">
+                                            <div class="payment-title">
+                                                <i class="fas fa-wallet"></i>
+                                                <span>کیف پول</span>
+                                            </div>
+                                            <div class="payment-desc">
+                                                موجودی: {{ user_wallet_balance|default:0|intcomma }} تومان
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Notes -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <h2>
+                                    <i class="fas fa-sticky-note"></i>
+                                    توضیحات سفارش
+                                </h2>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="order_notes">توضیحات (اختیاری)</label>
+                                <textarea name="order_notes" 
+                                          id="order_notes" 
+                                          rows="3" 
+                                          placeholder="توضیحات خاصی برای سفارش دارید؟"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Terms and Conditions -->
+                        <div class="form-section">
+                            <div class="form-options">
+                                <label class="checkbox-wrapper">
+                                    <input type="checkbox" name="terms" id="terms" required>
+                                    <span class="checkmark"></span>
+                                    <span class="terms-text">
+                                        با <a href="" target="_blank">شرایط و قوانین</a>
+                                        و <a href="" target="_blank">حریم خصوصی</a> موافقم
+                                    </span>
+                                </label>
+                                <label class="checkbox-wrapper">
+                                    <input type="checkbox" name="newsletter" id="newsletter">
+                                    <span class="checkmark"></span>
+                                    عضویت در خبرنامه و دریافت پیشنهادات ویژه
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="form-actions">
+                            <a href="{% url 'cart' %}" class="back-to-cart">
+                                <i class="fas fa-arrow-right"></i>
+                                بازگشت به سبد خرید
+                            </a>
+                            <button type="submit" class="submit-order" id="submitOrder">
+                                <i class="fas fa-lock"></i>
+                                تکمیل سفارش
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="order-summary">
+                    <div class="summary-card">
+                        <h3>خلاصه سفارش</h3>
+                        
+                        <!-- Order Items -->
+                        <div class="order-items">
+                            {% for item in cart_items %}
+                            <div class="order-item">
+                                <div class="item-image">
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                                    <span class="item-quantity">{{ item.quantity }}</span>
+                                </div>
+                                <div class="item-details">
+                                    <h4>{{ item.product.name }}</h4>
+                                    <div class="item-price">
+                                        {% if item.product.discount != 0 %}
+                                            <span class="current-price">{{ item.product.sale_price|intcomma }}</span>
+                                            <span class="original-price">{{ item.product.price|intcomma }}</span>
+                                        {% else %}
+                                            <span class="price">{{ item.product.price|intcomma }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="item-total">
+                                    {{ item.total_price|intcomma }} تومان
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Coupon Code -->
+                        <div class="coupon-section">
+                            <div class="coupon-input">
+                                <input type="text" placeholder="کد تخفیف" id="couponCode">
+                                <button type="button" onclick="applyCoupon()">اعمال</button>
+                            </div>
+                        </div>
+
+                        <!-- Order Totals -->
+                        <div class="order-totals">
+                            <div class="total-row">
+                                <span>جمع کالاها:</span>
+                                <span id="subtotal">{{ subtotal|intcomma }} تومان</span>
+                            </div>
+                            <div class="total-row discount-row" id="discountRow" >
+                                <span>تخفیف:</span>
+                                <span id="discountAmount">{{ discount }} تومان</span>
+                            </div>
+                            <div class="total-row">
+                                <span>هزینه ارسال:</span>
+                                <span id="shippingCost">
+                                    {% if subtotal >= 500000 %}
+                                        رایگان
+                                    {% else %}
+                                        {{ 30000|intcomma }} تومان
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="total-row cod-fee" id="codFeeRow" style="display: none;">
+                                <span>هزینه پرداخت در محل:</span>
+                                <span>{{ 10000|intcomma }} تومان</span>
+                            </div>
+                            <div class="total-divider"></div>
+                            <div class="total-row final-total">
+                                <span>مبلغ قابل پرداخت:</span>
+                                <span id="finalTotal">{{ total|intcomma }} تومان</span>
+                            </div>
+                        </div>
+
+                        <!-- Security Badge -->
+                        <div class="security-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            <div>
+                                <strong>خرید امن</strong>
+                                <p>اطلاعات شما محفوظ است</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trust Badges -->
+                    <div class="trust-badges">
+                        <div class="trust-item">
+                            <i class="fas fa-undo"></i>
+                            <span>ضمانت بازگشت</span>
+                        </div>
+                        <div class="trust-item">
+                            <i class="fas fa-headset"></i>
+                            <span>پشتیبانی ۲۴/۷</span>
+                        </div>
+                        <div class="trust-item">
+                            <i class="fas fa-shipping-fast"></i>
+                            <span>ارسال سریع</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Address Modal -->
+    {% if user.is_authenticated and user_addresses %}
+    <div class="modal" id="addressModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>انتخاب آدرس</h3>
+                <button class="close-modal" onclick="closeAddressModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="saved-addresses">
+                    {% for address in user_addresses %}
+                    <div class="address-item" onclick="selectAddress({{ address.id }})">
+                        <div class="address-info">
+                            <h4>{{ address.title }}</h4>
+                            <p>{{ address.full_address }}</p>
+                            <small>{{ address.city }}, {{ address.state }}</small>
+                        </div>
+                        <div class="address-actions">
+                            <button class="select-btn">انتخاب</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Messages from Django -->
+    {% if messages %}
+        {% for message in messages %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    showNotification('{{ message }}', '{{ message.tags }}');
+                });
+            </script>
+        {% endfor %}
+    {% endif %}
+
+    <script src="{% static 'js/script.js' %}"></script>
+    <script src="{% static 'js/checkout.js' %}"></script>
+</body>
+</html>

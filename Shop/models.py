@@ -61,20 +61,24 @@ class Cart(models.Model):
 
 class Order(models.Model):
     status_choices = (
-        ('Pending', 'Pending'),
-        ('Confirmed', 'Confirmed'),
-        ('OnTheWay', 'OnThWway'),
-        ('Canceled', 'Canceled'),
-        ('Completed', 'Completed')
+        ('Pending', 'در حال پردازش'),
+        ('Confirmed', 'تایید شده'),
+        ('OnTheWay', 'در حال ارسال'),
+        ('Canceled', 'لغو شده'),
+        ('Completed', 'سفارش کامل شده')
     )
+
     status = models.CharField(max_length=10, choices=status_choices, default='pending')
     products = models.ManyToManyField(Cart)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.TextField()
+    unit = models.IntegerField(null=True, blank=True)
     number = models.IntegerField()
-    city = models.TextField()
+    postal_code = models.CharField(max_length=20)
+    city = models.CharField(max_length=40)
     price = models.FloatField()
     date = models.DateTimeField(default=datetime.now)
+    notes = models.TextField(null=True, blank=True)
     token= models.CharField( blank= True,max_length=10,unique =True  )
 
     def save(self, *args, **kwargs):

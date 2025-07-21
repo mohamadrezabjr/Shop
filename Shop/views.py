@@ -294,21 +294,25 @@ def cart(request):
 
 def checkout(request):
     total = 0
-    products = Cart.objects.filter(user=request.user, ordered=False)
-    for x in products:
-        total += x.num * x.product.price
+    cart_items = Cart.objects.filter(user=request.user, ordered=False)
+    for cart_item in cart_items:
+        total += cart_item.total_price
+
     if request.method == 'POST':
         post= request.POST
         order = Order.objects.create(user=request.user, address=post['address'],
-                                     city=post['city'], number=post['number'], price=total)
-        order.products.set(products)
-        for y in products:
-            y.ordered = True
-            y.save()
+                                     city=post['city'], number=post['phone'], price=total,postal_code=post['postal_code'],
+                                    unit = post['unit'] if post['unit'] else 0, notes=post['order_notes'] if post['order_notes'] else None)
+
+        order.products.set(cart_items)
+        for cart_item in cart_items:
+            cart_item.ordered = True
+            cart_item.save()
         order.save()
         return redirect('index')
-
-    context = {'total': total, 'products': products}
+    subtotal = calculate_cart_total(request)['subtotal']
+    discount = subtotal - total
+    context = {'total': total, 'cart_items': cart_items, 'subtotal': subtotal, 'discount': discount}
     return render(request, 'checkout.html', context)
 
 

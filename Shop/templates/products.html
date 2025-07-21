@@ -152,6 +152,15 @@
                                 {% endfor %}
                             </div>
                         </div>
+                                            <div class="filter-group">
+                            <h4>موجودی</h4>
+                            <label class="filter-option">
+                                <input type="checkbox" name="in_stock" value="1"
+                                       {% if request.GET.in_stock %}checked{% endif %}>
+                                <span>فقط کالاهای موجود</span>
+                            </label>
+                        </div>
+
 
                         <button type="submit" class="apply-filters">اعمال فیلترها</button>
                     </form>
@@ -236,7 +245,7 @@
 
                                 <div class="product-info">
                                     <h3 class="product-title">
-                                        <a href="{% url 'detail' product.token %}">
+                                        <a href="{% url 'detail' product.token %}" style="text-decoration: none;">
                                             {{ product.name }}
                                         </a>
                                     </h3>
