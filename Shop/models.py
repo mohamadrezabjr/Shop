@@ -68,18 +68,15 @@ class Order(models.Model):
         ('Completed', 'سفارش کامل شده')
     )
 
-    status = models.CharField(max_length=10, choices=status_choices, default='pending')
+    status = models.CharField(max_length=30, choices=status_choices, default='pending')
     products = models.ManyToManyField(Cart)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    address = models.TextField()
-    unit = models.IntegerField(null=True, blank=True)
-    number = models.IntegerField()
-    postal_code = models.CharField(max_length=20,default = '000000')
-    city = models.CharField(max_length=40)
+    address = models.ForeignKey('Profile.Address', on_delete=models.CASCADE)
     price = models.FloatField()
     date = models.DateTimeField(default=datetime.now)
+    phone_number = models.CharField(max_length=11, null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
-    token= models.CharField( blank= True,max_length=10,unique =True  )
+    token= models.CharField( blank= True,max_length=10,unique =True)
 
     def save(self, *args, **kwargs):
         if not self.token:

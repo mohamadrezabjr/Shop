@@ -5,6 +5,8 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.contrib.auth import authenticate, logout, login
 from django.shortcuts import render, redirect
+from django.template.context_processors import request
+from Profile.models import Address, Profile
 from .models import *
 from django.contrib import messages
 import json
@@ -293,25 +295,34 @@ def cart(request):
 
 
 def checkout(request):
-    total = 0
+
+    total = calculate_cart_total(request)['total']
+    subtotal = calculate_cart_total(request)['subtotal']
+    discount = subtotal - total
     cart_items = Cart.objects.filter(user=request.user, ordered=False)
-    for cart_item in cart_items:
-        total += cart_item.total_price
 
     if request.method == 'POST':
-        post= request.POST
-        order = Order.objects.create(user=request.user, address=post['address'],
-                                     city=post['city'], number=post['phone'], price=total,postal_code=post['postal_code'],
-                                    unit = post['unit'] if post['unit'] else 0, notes=post['order_notes'] if post['order_notes'] else None)
 
+        city = request.POST.get('city')
+        unit = request.POST.get('unit') or 0
+        phone_number = request.POST.get('phone')
+        postal_code = request.POST.get('postal_code')
+        user = request.user
+        notes = request.POST.get('order_notes') or " "
+        save_address = request.POST.get('save_address')
+        print(save_address)
+
+        new_address = Address.objects.create(city=city, unit=unit, postal_code=postal_code, user=user)
+        new_address.save()
+
+        order = Order.objects.create(user=user, total=total, address=new_address, notes=notes, phone_number=phone_number)
         order.products.set(cart_items)
+        order.save()
         for cart_item in cart_items:
             cart_item.ordered = True
             cart_item.save()
-        order.save()
         return redirect('index')
-    subtotal = calculate_cart_total(request)['subtotal']
-    discount = subtotal - total
+
     context = {'total': total, 'cart_items': cart_items, 'subtotal': subtotal, 'discount': discount}
     return render(request, 'checkout.html', context)
 
