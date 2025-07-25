@@ -300,30 +300,47 @@ def checkout(request):
     subtotal = calculate_cart_total(request)['subtotal']
     discount = subtotal - total
     cart_items = Cart.objects.filter(user=request.user, ordered=False)
+    user_addresses = Address.objects.filter(user=request.user, save_address=True)
 
     if request.method == 'POST':
+        selected_address_id = request.POST['selected_address_id']
+        if selected_address_id:
+            order_address = Address.objects.get(id=selected_address_id)
+        else:
+            city = request.POST.get('city')
+            unit = request.POST.get('unit') or 0
+            postal_code = request.POST.get('postal_code')
+            address = request.POST.get('address')
+            save_address = request.POST.get('save_address')
+            order_address = Address.objects.create(address = address, city=city, unit=unit, postal_code=postal_code, user=user)
+            if save_address:
+                order_address.save_address = True
+                order_address.save()
 
-        city = request.POST.get('city')
-        unit = request.POST.get('unit') or 0
-        phone_number = request.POST.get('phone')
-        postal_code = request.POST.get('postal_code')
         user = request.user
         notes = request.POST.get('order_notes') or " "
-        save_address = request.POST.get('save_address')
-        print(save_address)
+        phone_number = request.POST.get('phone')
 
-        new_address = Address.objects.create(city=city, unit=unit, postal_code=postal_code, user=user)
-        new_address.save()
-
-        order = Order.objects.create(user=user, total=total, address=new_address, notes=notes, phone_number=phone_number)
+        order = Order.objects.create(user=user, price=total, address=order_address, notes=notes, phone_number=phone_number)
         order.products.set(cart_items)
         order.save()
+
         for cart_item in cart_items:
+            num = cart_item.num
+            item = cart_item.product
+
+            if item.stock >= num:
+                item.stock -= num
+
+            else:
+                item.stock = 0
+
+            item.save()
             cart_item.ordered = True
             cart_item.save()
         return redirect('index')
 
-    context = {'total': total, 'cart_items': cart_items, 'subtotal': subtotal, 'discount': discount}
+    context = {'user_addresses':user_addresses, 'total': total, 'cart_items': cart_items, 'subtotal': subtotal, 'discount': discount}
     return render(request, 'checkout.html', context)
 
 

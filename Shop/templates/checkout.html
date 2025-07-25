@@ -170,61 +170,127 @@
                                     <i class="fas fa-map-marker-alt"></i>
                                     آدرس تحویل
                                 </h2>
-                                {% if user.is_authenticated and user_addresses %}
-                                <button type="button" class="select-address-btn" onclick="showAddressModal()">
-                                    <i class="fas fa-list"></i>
-                                    انتخاب از آدرس‌های ذخیره شده
-                                </button>
-                                {% endif %}
                             </div>
 
-                            <div class="form-grid">
+                            <!-- Hidden field for selected address -->
+                            <input type="hidden" name="selected_address_id" id="selectedAddressId" value="">
 
-                                <div class="form-group full-width">
-                                    <label for="city">شهر *</label>
-                                <input type="text"
-                                           name="city"
-                                           id="city"
-                                           placeholder="شهر خود را وارد کنید"
-                                           required>
+                            <!-- Saved Addresses List -->
+                            {% if user.is_authenticated and user_addresses %}
+                            <div class="saved-addresses-section" id="savedAddressesSection">
+                                <h4 class="addresses-title">آدرس‌های ذخیره شده:</h4>
+                                <div class="saved-addresses-list">
+                                    {% for address in user_addresses %}
+                                    <div class="address-item"
+                                         data-id="{{ address.id }}"
+                                         data-city="{{ address.city }}"
+                                         data-address="{{ address.address }}"
+                                         data-postal-code="{{ address.postal_code }}"
+                                         data-unit="{{ address.unit|default:'' }}"
+                                         data-title="{{ address.title }}"
+                                         onclick="selectSavedAddress(this)">
+                                        <div class="address-info">
+                                            <h5>{{ address.title }}</h5>
+                                            <p>{{ address.address }}</p>
+                                            <small>{{ address.city }}</small>
+                                            {% if address.postal_code %}
+                                            <small class="postal-code">کد پستی: {{ address.postal_code }}</small>
+                                            {% endif %}
+                                        </div>
+                                        <div class="address-actions">
+                                            <button class="select-btn" type="button">انتخاب</button>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
                                 </div>
-                                <div class="form-group full-width">
-                                    <label for="address">آدرس کامل *</label>
-                                    <textarea name="address" 
-                                              id="address" 
-                                              rows="3" 
-                                              placeholder="آدرس کامل خود را وارد کنید..."
-                                              required></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label for="postal_code">کد پستی *</label>
-                                    <input type="text" 
-                                           name="postal_code" 
-                                           id="postal_code" 
-                                           placeholder="1234567890"
-                                           pattern="[0-9]{10}"
-                                           maxlength="10"
-                                           required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="unit">واحد</label>
-                                    <input type="text" 
-                                           name="unit" 
-                                           id="unit" 
-                                           placeholder="شماره واحد">
-                                </div>
-                            </div>
 
-                            <!-- Save Address Option -->
-                            {% if user.is_authenticated %}
-                            <div class="form-options">
-                                <label class="checkbox-wrapper">
-                                    <input type="checkbox" name="save_address" id="save_address">
-                                    <span class="checkmark"></span>
-                                    ذخیره این آدرس برای خریدهای بعدی
-                                </label>
+                                <div class="new-address-section">
+                                    <button type="button" class="new-address-btn" onclick="showNewAddressForm()">
+                                        <i class="fas fa-plus"></i>
+                                        آدرس جدید
+                                    </button>
+                                </div>
                             </div>
                             {% endif %}
+
+                            <!-- Selected Address Display -->
+                            <div class="selected-address-display" id="selectedAddressDisplay" style="display: none;">
+                                <div class="selected-address-card">
+                                    <div class="selected-address-header">
+                                        <h4 id="selectedAddressTitle"></h4>
+                                        <button type="button" class="change-address-btn" onclick="changeSelectedAddress()">
+                                            <i class="fas fa-edit"></i>
+                                            تغییر
+                                        </button>
+                                    </div>
+                                    <div class="selected-address-details" id="selectedAddressDetails">
+                                        <!-- آدرس انتخاب شده اینجا نمایش داده می‌شود -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Address Form -->
+                            <div class="address-form-section" id="addressFormSection" {% if user.is_authenticated and user_addresses %}style="display: none;"{% endif %}>
+                                <div class="form-grid">
+
+                                    <div class="form-group full-width">
+                                        <label for="city">شهر *</label>
+                                        <input type="text"
+                                               name="city"
+                                               id="city"
+                                               placeholder="نام شهر"
+                                               maxlength="10"
+                                               required>
+                                    </div>
+
+                                    <div class="form-group full-width">
+                                        <label for="address">آدرس کامل *</label>
+                                        <textarea name="address"
+                                                  id="address"
+                                                  rows="3"
+                                                  placeholder="آدرس کامل خود را وارد کنید..."
+                                                  required></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="postal_code">کد پستی *</label>
+                                        <input type="text"
+                                               name="postal_code"
+                                               id="postal_code"
+                                               placeholder="1234567890"
+                                               pattern="[0-9]{10}"
+                                               maxlength="10"
+                                               required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="unit">واحد</label>
+                                        <input type="text"
+                                               name="unit"
+                                               id="unit"
+                                               placeholder="شماره واحد">
+                                    </div>
+                                </div>
+
+                                <!-- Save Address Option -->
+                                {% if user.is_authenticated %}
+                                <div class="form-options">
+                                    <label class="checkbox-wrapper">
+                                        <input type="checkbox" name="save_address" id="save_address">
+                                        <span class="checkmark"></span>
+                                        ذخیره این آدرس برای خریدهای بعدی
+                                    </label>
+                                </div>
+                                {% endif %}
+
+                                <!-- Back to saved addresses button -->
+                                {% if user.is_authenticated and user_addresses %}
+                                <div class="back-to-addresses">
+                                    <button type="button" class="back-to-addresses-btn" onclick="showSavedAddresses()">
+                                        <i class="fas fa-arrow-right"></i>
+                                        بازگشت به آدرس‌های ذخیره شده
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
 
                         <!-- Shipping Method -->
@@ -359,9 +425,9 @@
 
                             <div class="form-group">
                                 <label for="order_notes">توضیحات (اختیاری)</label>
-                                <textarea name="order_notes" 
-                                          id="order_notes" 
-                                          rows="3" 
+                                <textarea name="order_notes"
+                                          id="order_notes"
+                                          rows="3"
                                           placeholder="توضیحات خاصی برای سفارش دارید؟"></textarea>
                             </div>
                         </div>
@@ -403,7 +469,7 @@
                 <div class="order-summary">
                     <div class="summary-card">
                         <h3>خلاصه سفارش</h3>
-                        
+
                         <!-- Order Items -->
                         <div class="order-items">
                             {% for item in cart_items %}
@@ -424,7 +490,7 @@
                                     </div>
                                 </div>
                                 <div class="item-total">
-                                    {{ item.total_price|intcomma }} تومان
+                                    {{ item.get_total_price|intcomma }} تومان
                                 </div>
                             </div>
                             {% endfor %}
@@ -444,9 +510,9 @@
                                 <span>جمع کالاها:</span>
                                 <span id="subtotal">{{ subtotal|intcomma }} تومان</span>
                             </div>
-                            <div class="total-row discount-row" id="discountRow" >
+                            <div class="total-row discount-row" id="discountRow" style="display: none;">
                                 <span>تخفیف:</span>
-                                <span id="discountAmount">{{ discount }} تومان</span>
+                                <span id="discountAmount">0 تومان</span>
                             </div>
                             <div class="total-row">
                                 <span>هزینه ارسال:</span>
@@ -498,34 +564,6 @@
             </div>
         </div>
     </section>
-
-    <!-- Address Modal -->
-    {% if user.is_authenticated and user_addresses %}
-    <div class="modal" id="addressModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>انتخاب آدرس</h3>
-                <button class="close-modal" onclick="closeAddressModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="saved-addresses">
-                    {% for address in user_addresses %}
-                    <div class="address-item" onclick="selectAddress({{ address.id }})">
-                        <div class="address-info">
-                            <h4>{{ address.title }}</h4>
-                            <p>{{ address.full_address }}</p>
-                            <small>{{ address.city }}, {{ address.state }}</small>
-                        </div>
-                        <div class="address-actions">
-                            <button class="select-btn">انتخاب</button>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 
     <!-- Messages from Django -->
     {% if messages %}

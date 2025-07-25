@@ -44,9 +44,31 @@ function initializeFormValidation() {
 
 function validateCheckoutForm() {
   let isValid = true
-  const requiredFields = document.querySelectorAll("input[required], select[required], textarea[required]")
 
-  requiredFields.forEach((field) => {
+  // Check if address is selected or form is filled
+  const selectedAddressId = document.getElementById("selectedAddressId").value
+  const addressFormSection = document.getElementById("addressFormSection")
+
+  if (!selectedAddressId && addressFormSection.style.display !== "none") {
+    // Validate address form fields
+    const requiredAddressFields = addressFormSection.querySelectorAll(
+      "input[required], select[required], textarea[required]",
+    )
+
+    requiredAddressFields.forEach((field) => {
+      if (!field.value.trim()) {
+        showFieldError(field, "این فیلد الزامی است")
+        isValid = false
+      } else {
+        clearFieldError(field)
+      }
+    })
+  }
+
+  // Validate personal information
+  const requiredPersonalFields = document.querySelectorAll("#first_name, #last_name, #email, #phone")
+
+  requiredPersonalFields.forEach((field) => {
     if (!field.value.trim()) {
       showFieldError(field, "این فیلد الزامی است")
       isValid = false
@@ -69,11 +91,13 @@ function validateCheckoutForm() {
     isValid = false
   }
 
-  // Validate postal code
-  const postalCodeField = document.getElementById("postal_code")
-  if (postalCodeField.value && postalCodeField.value.length !== 10) {
-    showFieldError(postalCodeField, "کد پستی باید 10 رقم باشد")
-    isValid = false
+  // Validate postal code (only if address form is visible)
+  if (!selectedAddressId) {
+    const postalCodeField = document.getElementById("postal_code")
+    if (postalCodeField.value && postalCodeField.value.length !== 10) {
+      showFieldError(postalCodeField, "کد پستی باید 10 رقم باشد")
+      isValid = false
+    }
   }
 
   // Check terms acceptance
@@ -286,33 +310,179 @@ function initializePhoneFormatting() {
   })
 }
 
-// Address Modal Functions
-function showAddressModal() {
-  const modal = document.getElementById("addressModal")
-  if (modal) {
-    modal.style.display = "block"
-    document.body.style.overflow = "hidden"
+// Address Management Functions
+function selectSavedAddress(element) {
+  console.log("[DEBUG] Selecting saved address")
+
+  // Extract address data
+  const addressData = {
+    id: element.dataset.id,
+    title: element.dataset.title,
+    state: element.dataset.state,
+    city: element.dataset.city,
+    address: element.dataset.address,
+    postal_code: element.dataset.postalCode,
+    unit: element.dataset.unit || "",
   }
+
+  // Set selected address ID
+  document.getElementById("selectedAddressId").value = addressData.id
+
+  // Hide saved addresses section and show selected address
+  const savedAddressesSection = document.getElementById("savedAddressesSection")
+  const selectedAddressDisplay = document.getElementById("selectedAddressDisplay")
+  const addressFormSection = document.getElementById("addressFormSection")
+
+  savedAddressesSection.style.display = "none"
+  selectedAddressDisplay.style.display = "block"
+  addressFormSection.style.display = "none"
+
+  // Display selected address
+  document.getElementById("selectedAddressTitle").textContent = addressData.title
+  document.getElementById("selectedAddressDetails").innerHTML = `
+        <div class="address-detail-row">
+            <strong>آدرس:</strong> ${addressData.address}
+        </div>
+        <div class="address-detail-row">
+            <strong>شهر:</strong> ${addressData.city}
+        </div>
+        ${addressData.postal_code ? `<div class="address-detail-row"><strong>کد پستی:</strong> ${addressData.postal_code}</div>` : ""}
+        ${addressData.unit ? `<div class="address-detail-row"><strong>واحد:</strong> ${addressData.unit}</div>` : ""}
+    `
+
+  // Remove required attributes from address form fields
+  removeAddressFormRequirements()
+
+  showNotification(`آدرس "${addressData.title}" انتخاب شد`, "success")
+
+  console.log("[DEBUG] Address selected:", addressData)
+}
+
+function changeSelectedAddress() {
+  console.log("[DEBUG] Changing selected address")
+  showSavedAddresses()
+}
+
+function showSavedAddresses() {
+  console.log("[DEBUG] Showing saved addresses")
+
+  // Clear selected address
+  document.getElementById("selectedAddressId").value = ""
+
+  // Show saved addresses section and hide others
+  const savedAddressesSection = document.getElementById("savedAddressesSection")
+  const selectedAddressDisplay = document.getElementById("selectedAddressDisplay")
+  const addressFormSection = document.getElementById("addressFormSection")
+
+  if (savedAddressesSection) {
+    savedAddressesSection.style.display = "block"
+  }
+  selectedAddressDisplay.style.display = "none"
+  addressFormSection.style.display = "none"
+
+  // Add required attributes back to address form fields
+  addAddressFormRequirements()
+
+  showNotification("آدرس‌های ذخیره شده نمایش داده شد", "info")
+}
+
+function showNewAddressForm() {
+  console.log("[DEBUG] Showing new address form")
+
+  // Clear selected address
+  document.getElementById("selectedAddressId").value = ""
+
+  // Hide saved addresses and selected address, show form
+  const savedAddressesSection = document.getElementById("savedAddressesSection")
+  const selectedAddressDisplay = document.getElementById("selectedAddressDisplay")
+  const addressFormSection = document.getElementById("addressFormSection")
+
+  if (savedAddressesSection) {
+    savedAddressesSection.style.display = "none"
+  }
+  selectedAddressDisplay.style.display = "none"
+  addressFormSection.style.display = "block"
+
+  // Add required attributes back to address form fields
+  addAddressFormRequirements()
+
+  // Clear address form
+  clearAddressForm()
+
+  // Focus on first field
+  const stateSelect = document.getElementById("state")
+  if (stateSelect) {
+    stateSelect.focus()
+  }
+
+  showNotification("فرم آدرس جدید آماده است", "info")
+}
+
+// Remove required attributes from address form
+function removeAddressFormRequirements() {
+  const addressFields = document.querySelectorAll(
+    "#addressFormSection input[required], #addressFormSection select[required], #addressFormSection textarea[required]",
+  )
+
+  addressFields.forEach((field) => {
+    field.removeAttribute("required")
+    field.dataset.wasRequired = "true"
+  })
+}
+
+// Add required attributes back to address form
+function addAddressFormRequirements() {
+  const addressFields = document.querySelectorAll(
+    "#addressFormSection input[data-was-required], #addressFormSection select[data-was-required], #addressFormSection textarea[data-was-required]",
+  )
+
+  addressFields.forEach((field) => {
+    field.setAttribute("required", "")
+    field.removeAttribute("data-was-required")
+  })
+
+  // Also add required to fields that should always be required
+  const alwaysRequiredFields = document.querySelectorAll("#state, #city, #address, #postal_code")
+
+  alwaysRequiredFields.forEach((field) => {
+    if (field) {
+      field.setAttribute("required", "")
+    }
+  })
+}
+
+function clearAddressForm() {
+  console.log("[DEBUG] Clearing address form")
+
+  const stateSelect = document.getElementById("state")
+  const citySelect = document.getElementById("city")
+  const addressTextarea = document.getElementById("address")
+  const postalCodeInput = document.getElementById("postal_code")
+  const unitInput = document.getElementById("unit")
+
+  if (stateSelect) stateSelect.value = ""
+
+  if (addressTextarea) addressTextarea.value = ""
+  if (postalCodeInput) postalCodeInput.value = ""
+  if (unitInput) unitInput.value = ""
+}
+
+// Remove old modal functions and replace with empty functions to avoid errors
+function showAddressModal() {
+  console.log("[DEBUG] showAddressModal called but modal is removed")
 }
 
 function closeAddressModal() {
-  const modal = document.getElementById("addressModal")
-  if (modal) {
-    modal.style.display = "none"
-    document.body.style.overflow = ""
-  }
+  console.log("[DEBUG] closeAddressModal called but modal is removed")
 }
 
-function selectAddress(addressId) {
-  // This would typically fetch address data from server
-  // For now, we'll simulate it
-  console.log(`[DEBUG] Selected address ID: ${addressId}`)
+function selectAddressWithData() {
+  console.log("[DEBUG] selectAddressWithData called but modal is removed")
+}
 
-  // Fill form with selected address data
-  // This is where you'd populate the form fields with the selected address
-
-  closeAddressModal()
-  showNotification("آدرس انتخاب شد", "success")
+function createNewAddress() {
+  console.log("[DEBUG] createNewAddress called - redirecting to showNewAddressForm")
+  showNewAddressForm()
 }
 
 // Coupon Functions
@@ -389,14 +559,6 @@ document.addEventListener("DOMContentLoaded", () => {
       clearFieldError(this)
     })
   })
-})
-
-// Close modal when clicking outside
-window.addEventListener("click", (event) => {
-  const modal = document.getElementById("addressModal")
-  if (event.target === modal) {
-    closeAddressModal()
-  }
 })
 
 // Get CSRF token
