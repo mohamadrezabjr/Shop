@@ -8,4 +8,4 @@ class ProductAdmin(admin.ModelAdmin):
 admin.site.register(Cart)
 admin.site.register(Order)
 admin.site.register(Category)
-
+admin.site.register(Image)

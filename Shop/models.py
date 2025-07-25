@@ -7,10 +7,8 @@ from django.contrib.auth.models import User
 import string ,random
 
 def code_generator(type = 'P' , length = 7):  # Default for products
-
         code = type + '-'+''.join(random.choices(string.digits, k = length))
         return code
-
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
@@ -20,6 +18,12 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+class Image(models.Model):
+    image = models.ImageField(upload_to='images/')
+
+    def __str__(self):
+        return f'{self.product.first().name}`s image : {self.image} '
+
 class Product(models.Model):
     name = models.CharField(max_length=100)
     price = models.IntegerField()
@@ -28,6 +32,7 @@ class Product(models.Model):
     stock = models.IntegerField(default=5)
     condition = models.BooleanField(default=True)
     image = models.ImageField(default='images/no_image.jpg',null=True, blank=True)
+    gallery_images = models.ManyToManyField(Image, related_name='product', blank=True)
     description = models.TextField(null=True, blank=True)
     extra_details = models.TextField(null=True, blank=True, default=None)
     discount = models.IntegerField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
@@ -45,7 +50,6 @@ class Product(models.Model):
     def __str__(self):
         return '{} - {}'.format(self.name, self.category)
 
-
 class Cart(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -57,7 +61,6 @@ class Cart(models.Model):
         super().save(*args, **kwargs)
     def __str__(self):
         return (f"{self.num} of {self.product.name} for {self.user.username} ")
-
 
 class Order(models.Model):
     status_choices = (

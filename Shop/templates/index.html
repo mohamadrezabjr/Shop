@@ -114,6 +114,20 @@
                                 {{ product.name }}
                             </a>
                         </h3>
+                                        <!-- Stock Status -->
+                    <div class="stock-status">
+                        {% if product.stock > 0 %}
+                            <span class="in-stock">
+                                <i class="fas fa-check-circle"></i>
+                                موجود در انبار ({{ product.stock }} عدد)
+                            </span>
+                        {% else %}
+                            <span class="out-of-stock">
+                                <i class="fas fa-times-circle"></i>
+                                ناموجود
+                            </span>
+                        {% endif %}
+                    </div>
 
                         <!-- قیمت با تخفیف -->
                         <div class="product-pricing">
