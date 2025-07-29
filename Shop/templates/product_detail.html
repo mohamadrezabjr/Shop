@@ -400,14 +400,14 @@
                             {{ related_product.discount }}% تخفیف
                         </div>
                     {% endif %}
-                    
-                    <a href="{% url 'detail' related_product.token %}">
+
+                    <a href="{% url 'detail' related_product.token %}" style="text-decoration: none;">
                         <img src="{{ related_product.image.url }}" alt="{{ related_product.name }}" class="product-image">
                     </a>
                     
-                    <div class="product-info">
+                    <div class="product0.0-info">
                         <h3 class="product-title">
-                            <a href="/detail">{{ related_product.name }}</a>
+                            <a href="/detail" style="text-decoration: none; color : inherit">{{ related_product.name }}</a>
                         </h3>
                         
                         <div class="product-pricing">

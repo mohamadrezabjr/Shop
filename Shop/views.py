@@ -159,9 +159,11 @@ def details(request, token):
             return redirect('login')
 
     this_product = get_object_or_404(Product, token=token)
+    category = this_product.category
+    related_products = Product.objects.filter(category=category)
     n = cart_num(request)
     extra = this_product.extra_details.split('\n')
-    context = {'product': this_product, 'n': n,  'extra': extra}
+    context = {'product': this_product, 'related_products' : related_products, 'n': n,  'extra': extra}
 
     return render(request, "product_detail.html", context=context)
 
@@ -216,6 +218,7 @@ def add_to_cart(request, token):
     return redirect('login')
 def calculate_cart_total(request):
     cart = Cart.objects.filter(user=request.user, ordered=False)
+    print(cart)
     # price with discount
     total = 0
     # price without discount

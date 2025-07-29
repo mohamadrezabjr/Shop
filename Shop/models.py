@@ -13,7 +13,7 @@ def code_generator(type = 'P' , length = 7):  # Default for products
 class Category(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(null=True, blank=True)
-    icon = models.ImageField(default='images/no_image.jpg')
+    icon = models.ImageField(default='images/no_image.png')
 
     def __str__(self):
         return self.name
@@ -22,8 +22,9 @@ class Image(models.Model):
     image = models.ImageField(upload_to='images/')
 
     def __str__(self):
-        return f'{self.product.first().name}`s image : {self.image} '
-
+        if self.product.first():
+            return f'{self.product.first().name or "product"}`s image : {self.image} '
+        return f'product`s image : {self.image} '
 class Product(models.Model):
     name = models.CharField(max_length=100)
     price = models.IntegerField()
@@ -31,7 +32,7 @@ class Product(models.Model):
     date = models.DateTimeField(auto_now_add=True, null = True, blank = True)
     stock = models.IntegerField(default=5)
     condition = models.BooleanField(default=True)
-    image = models.ImageField(default='images/no_image.jpg',null=True, blank=True)
+    image = models.ImageField(default='images/no_image.png',null=True, blank=True)
     gallery_images = models.ManyToManyField(Image, related_name='product', blank=True)
     description = models.TextField(null=True, blank=True)
     extra_details = models.TextField(null=True, blank=True, default=None)
