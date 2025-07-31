@@ -90,7 +90,7 @@ def products(request):
 def categories(request):
     category = Category.objects.all()
     n = cart_num(request)
-    context = {'category': category, 'n': n}
+    context = {'categories': category, 'n': n}
     return render(request, 'categories.html', context)
 
 

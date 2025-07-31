@@ -1,123 +1,112 @@
-{% extends 'master.html' %}
+<!DOCTYPE html>
+{% load humanize %}
 {% load static %}
-
-{% block title %}
-User Profile
-{% endblock %}
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-        }
-        .full-page {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 20px;
-            background-color: #f8f9fa;
-        }
-        .content-container {
-            width: 80%;
-            max-width: 900px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        .nav-tabs {
-            border-bottom: 2px solid #007bff;
-        }
-    </style>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فروشگاه آنلاین</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-{% block header %}
-        <h1>User Profile</h1>
-        <p></p>
-{% endblock %}
-{% block content %}
-
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#"></a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href={% url "index" %}>Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href = '/logout' class="nav-link" >Logout</a>
-                        </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://github.com/mohamadrezabjr">Contact</a>
-                    </li>
-                </ul>
-                {% if user.is_authenticated %}
-                <div class="cart-container">
-                    <a href = '{% url 'cart' %}' style="text-decoration: none">
-                    <i class="bi bi-cart cart-icon"></i>
-                    <img src = "{% static 'images/cart.png' %}" alt="Cart" class="cart-icon">
-                    <span class="cart-count"> {{ n }}
-                    </span>
-                    </a>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <h2>فروشگاه آنلاین</h2>
                 </div>
-                {% endif %}
-                </div>
-                </a>
-            </div>
-        </div>
-    </nav>
-    <div class="card-body">
-        <div class="content-container">
 
-            <!-- Tabs -->
-            <ul class="nav nav-tabs" id="profileTabs" role="tablist" dir="rtl">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">Information</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" role="tab">Orders</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">Settings</button>
-                </li>
-            </ul>
-
-            <!-- Tab Content -->
-            <div class="tab-content mt-3" id="profileTabsContent">
-                <div class="tab-pane fade show active" id="info" role="tabpanel">
-                    <h4>User Information</h4>
-                    <p><strong>Name :</strong> {{ name }}</p>
-                    <p><strong>Email :</strong> {{ email }}</p>
-                </div>
-                <div class="tab-pane fade" id="orders" role="tabpanel">
-                    <h4>Your Orders</h4>
-                    <ul class="list-group">
-                        {% for x in order %}
-
-                            <li class="list-group-item order-item">
-
-                            <div class="order-details">
-                                <p><strong>Date :</strong> {{ x.date.date }}</p>
-                                <p><strong>Status :</strong> {{ x.status }}</p>
-                                <p><strong>Price:</strong> {{ x.price }} $</p>
-                            </div>
-                            <a href="order/{{ x.token }}" class="btn btn-primary">View Details</a>
-                        </li>
-                        {% endfor %}
+                <nav class="nav-menu" id="navMenu">
+                    <ul>
+                        <li><a href="{% url 'index' %}">خانه</a></li>
+                        <li><a href="{% url 'products' %}">محصولات</a></li>
+                        <li><a href="{% url 'categories' %}">دسته‌بندی</a></li>
+                        <li><a href="#about">درباره ما</a></li>
+                        <li><a href="#contact">تماس</a></li>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'profile' %}">پروفایل</a></li>
+                            <li><a href="{% url 'logout' %}">خروج</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">ورود</a></li>
+                            <li><a href="{% url 'register' %}">ثبت نام</a></li>
+                        {% endif %}
                     </ul>
-                </div>
-                <div class="tab-pane fade" id="settings" role="tabpanel">
-                    <h4>Settings</h4>
-                    <a href = "{% url 'password_reset' %}">
-                    <button class="btn btn-danger">Change Password</button></a>
+                </nav>
+
+                <div class="header-actions">
+                    <div class="search-box">
+                        <form method="GET" action="{% url 'search' %}">
+                            <input type="text" name="q" placeholder="جستجو کنید..." id="searchInput" value="{{ request.GET.q }}">
+                            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+                        </form>
+                    </div>
+                    <a href="{% url 'cart' %}" class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">{{ n }}</span>
+                    </a>
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
                 </div>
             </div>
         </div>
-    </div>
+    </header>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-{% endblock%}
+<head>
+    <meta charset="UTF-8">
+    <title>پروفایل کاربر</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+
+    <!-- Profile Section -->
+    <section class="features" style="padding-top: 160px;">
+        <div class="container">
+            <h2 class="section-title">پروفایل من</h2>
+            <div class="features-grid">
+                <div class="feature-card" style="text-align: right">
+                    <h3>اطلاعات حساب</h3>
+                    <p><strong>نام کاربر:</strong> {{ user.get_full_name }}</p>
+                    <p><strong>ایمیل:</strong> {{ user.email }}</p>
+                    <p><strong>تاریخ عضویت:</strong> {{ user.date_joined|date:"Y/m/d" }}</p>
+                    <a href="" class="load-more-btn" style="margin-top: 1rem;">ویرایش اطلاعات</a>
+                </div>
+
+                <div class="feature-card" style="text-align: right">
+                    <h3>تنظیمات</h3>
+                    <p>برای تغییر رمز عبور یا اطلاعات ورود، به بخش ویرایش مراجعه کنید.</p>
+                    <a href="{% url 'logout' %}" class="load-more-btn" style="background: #e74c3c;">خروج از حساب</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Orders Section -->
+    <section class="products">
+        <div class="container">
+            <h2 class="section-title">سفارش‌های من</h2>
+            <div class="products-grid">
+                {% for order in orders %}
+                <div class="product-card">
+                    <div class="product-info">
+                        <h3 class="product-title">سفارش #{{ order.id }}</h3>
+                        <p><strong>تاریخ:</strong> {{ order.created_at|date:"Y/m/d" }}</p>
+                        <p><strong>وضعیت:</strong> {{ order.status_display }}</p>
+                        <p><strong>مبلغ:</strong> {{ order.total_price|intcomma }} تومان</p>
+                        <a href="" class="load-more-btn" style="margin-top: 1rem;">مشاهده جزئیات</a>
+                    </div>
+                </div>
+                {% empty %}
+                <p>شما هنوز سفارشی ثبت نکرده‌اید.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+
+
+</body>
 </html>
-

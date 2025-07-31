@@ -1,117 +1,88 @@
-{% extends 'master.html' %}
+<!DOCTYPE html>
+{% load humanize %}
 {% load static %}
-{% block title %}
-Products
-{% endblock %}
-{% block header %}
-    <h1>Categories</h1>
-
-        {% endblock %}
-{% block content %}
-
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-
-        <div class="container-fluid">
-
-
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-
-                <li class="nav-item">
-                        <a href = '{% url "index" %}' class="nav-link" >Home</a>
-                        </li>
-
-                    {% if  user.is_authenticated  %}
-                        <li class="nav-item">
-                        <a href = '/logout' class="nav-link" >Logout</a>
-                        </li>
-
-                    {% else  %}
-                        <li class="nav-item">
-                        <a href =  '{% url 'register' %}' class="nav-link" >Register</a>
-                    </li>
-                        <li class="nav-item">
-                        <a href = '/login' class="nav-link" >Login</a>
-                        </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <a href =  '{% url 'search' %}' class="nav-link" >Search</a>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://github.com/mohamadrezabjr">Contact</a>
-                    </li>
-
-                    </li>
-
-            {% if user.is_authenticated %}
-
-                <li class="nav-item">
-                        <a href = '{% url 'profile' %}' class="nav-link" >Profile</a>
-                        </li>
-                </ul>
-
-                <div class="cart-container">
-                    <a href = '{% url 'cart' %}' style="text-decoration: none">
-                    <i class="bi bi-cart cart-icon"></i>
-                    <img src = "{% static 'images/cart.png' %}" alt="Cart" class="cart-icon">
-                    <span class="cart-count"> {{ n }}
-                    </span>
-                    </a>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فروشگاه آنلاین</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <h2>فروشگاه آنلاین</h2>
                 </div>
-            {% endif %}
+
+                <nav class="nav-menu" id="navMenu">
+                    <ul>
+                        <li><a href="{% url 'index' %}">خانه</a></li>
+                        <li><a href="{% url 'products' %}">محصولات</a></li>
+                        <li><a href="{% url 'categories' %}">دسته‌بندی</a></li>
+                        <li><a href="#about">درباره ما</a></li>
+                        <li><a href="#contact">تماس</a></li>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'profile' %}">پروفایل</a></li>
+                            <li><a href="{% url 'logout' %}">خروج</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">ورود</a></li>
+                            <li><a href="{% url 'register' %}">ثبت نام</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+
+                <div class="header-actions">
+                    <div class="search-box">
+                        <form method="GET" action="{% url 'search' %}">
+                            <input type="text" name="q" placeholder="جستجو کنید..." id="searchInput" value="{{ request.GET.q }}">
+                            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+                        </form>
+                    </div>
+                    <a href="{% url 'cart' %}" class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">{{ n }}</span>
+                    </a>
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
             </div>
         </div>
-    </nav>
+    </header>
 
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>دسته بندی محصولات</h1>
+        </div>
 
-    <section class="text-center bg-light py-5">
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories">
         <div class="container">
-            <h1>Available Products</h1>
-            <p class="lead">Browse and purchase the best products tailored to your needs.</p>
-        </div>
-    </section>
+            <h2 class="section-title">دسته‌بندی محصولات</h2>
+            <div class="categories-grid">
+                {% for category in categories %}
+                <a href="{% url 'category_products' category.name %}" style="text-decoration: none">
+                    <div class="category-card">
+                        <div class="category-icon">
+                            {% if category.icon  %}
+                            <img src = "{{ category.icon.url }}" alt="{{ category.name }}"  class = 'product-image'>
+                            {% endif %}
 
-
-
- <section class="container py-5">
-
-        <div class="row g-4">
-            {% for cat in category %}
-            <div class="col-md-4 mx-auto">
-                <a href="{{ cat.name }}/" class="text-decoration-none">
-                    <div class="card h-100 text-center">
-                    <img src="{{ cat.image.url }}" class="card-img-top" alt="{{ cat.name }}">
-
-                    <div class="card-body">
-                         <h3 class="card-title">{{ cat.name }}</h3>
-                        <p class="card-text"></p>
+                        </div>
+                        <h3>{{ category.name }}</h3>
+                        <p>{{ category.description }}</p>
                     </div>
-
-                </div>
-            </div></a>
-        {% endfor %}
-
+                </a>
+                {% endfor %}
+            </div>
         </div>
-
     </section>
-
-    <script >
-    document.addEventListener("DOMContentLoaded", function() {
-    var navbarToggler = document.querySelector(".navbar-toggler");
-    var navbarCollapse = document.querySelector(".navbar-collapse");
-
-    document.addEventListener("click", function(event) {
-        var isClickInsideNavbar = navbarCollapse.contains(event.target) || navbarToggler.contains(event.target);
-
-        if (!isClickInsideNavbar && navbarCollapse.classList.contains("show")) {
-            new bootstrap.Collapse(navbarCollapse).hide();
-        }
-    });
-});
-
-    </script>
-{% endblock %}
+</body>
+</html>
