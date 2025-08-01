@@ -1,15 +1,16 @@
 {% load static %}
-{% load humanize %}
+
 <!DOCTYPE html>
 <html lang="fa">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پروفایل کاربر - فروشگاه آنلاین</title>
+    <title>مدیریت آدرس‌ها - فروشگاه آنلاین</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/auth.css' %}">
-    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
-    <script src="{% static 'js/profile.js' %}" defer></script>
+    <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+    <link rel="stylesheet" href="{% static 'css/addresses.css' %}">
+    <script src="{% static 'js/addresses.js' %}" defer></script>
 </head>
 <body>
     <!-- Header -->
@@ -27,7 +28,8 @@
                         <li><a href="">درباره ما</a></li>
                         <li><a href="">تماس</a></li>
                         {% if user.is_authenticated %}
-                            <li><a href="{% url 'profile' %}" class="active">پروفایل</a></li>
+                            <li><a href="{% url 'profile' %}">پروفایل</a></li>
+                            <li><a href="{% url 'addresses' %}" class="active">آدرس‌ها</a></li>
                             <li><a href="{% url 'logout' %}">خروج</a></li>
                         {% else %}
                             <li><a href="{% url 'login' %}">ورود</a></li>
@@ -50,132 +52,93 @@
         </div>
     </header>
 
-    <!-- Profile Section -->
+    <!-- Addresses Section -->
     <section class="profile-section auth-section">
         <div class="container">
-            <h2 class="section-title">پروفایل کاربر</h2>
+            <h2 class="section-title">مدیریت آدرس‌ها</h2>
             <div class="auth-container">
-                <!-- Profile Information -->
-                <div class="auth-card">
+                <!-- Saved Addresses -->
+                <div class="auth-card saved-addresses-section">
                     <div class="auth-header">
                         <div class="auth-icon">
-                            <i class="fas fa-user"></i>
+                            <i class="fas fa-map-marker-alt"></i>
                         </div>
-                        <h1>اطلاعات پروفایل</h1>
-                        <p>اطلاعات شخصی خود را مشاهده و ویرایش کنید</p>
+                        <h1>آدرس‌های ذخیره‌شده</h1>
+                        <p>آدرس‌های ثبت‌شده خود را مشاهده کنید</p>
                     </div>
-                    <div class="profile-info">
-                        <div class="profile-item">
-                            <strong>نام کاربری:</strong>
-                            <span>{{ user.username }}</span>
-                        </div>
-                        <div class="profile-item">
-                            <strong>ایمیل:</strong>
-                            <span>{{ user.email }}</span>
-                        </div>
-                        <div class="profile-item">
-                            <strong>نام و نام خانوادگی:</strong>
-                            <span>{{ user.first_name }} {{ user.last_name }}</span>
-                        </div>
-                        <div class="profile-item">
-                            <strong>شماره تماس:</strong>
-                            <span>{{ user.phone_number|default:"ثبت نشده" }}</span>
-                        </div>
-                        <div class="profile-item">
-                            <strong>آدرس:</strong>
-                            <span>{{ user.address|default:"ثبت نشده" }}</span>
-                        </div>
-                    </div>
-                    <button class="auth-btn edit-profile-btn" data-action="edit">
-                        <i class="fas fa-edit"></i> ویرایش پروفایل
-                    </button>
-                </div>
-
-                <!-- Order History -->
-                <div class="auth-card order-history">
-                    <div class="auth-header">
-                        <div class="auth-icon">
-                            <i class="fas fa-shopping-bag"></i>
-                        </div>
-                        <h1>تاریخچه سفارشات</h1>
-                        <p>لیست سفارشات اخیر شما</p>
-                    </div>
-                    <div class="order-list">
-                        {% for order in orders %}
-                            <div class="order-item">
-                                <div class="order-info">
-                                    <h4>سفارش #{{ order.id }}</h4>
-                                    <p>تاریخ: {{ order.date|date:"Y/m/d" }}</p>
-                                    <p>مبلغ: {{ order.total_price|intcomma }} تومان</p>
-                                    <p>وضعیت: {{ order.status }}</p>
+                    <div class="saved-addresses-list">
+                        {% for address in addresses %}
+                            <div class="address-item">
+                                <div class="address-info">
+                                    <h5>{{ address.city }}</h5>
+                                    <p>{{ address.address }}</p>
+                                    {% if address.unit %}
+                                        <p>واحد: {{ address.unit }}</p>
+                                    {% endif %}
+                                    <small class="postal-code">کد پستی: {{ address.postal_code }}</small>
                                 </div>
-                                <a href="{% url 'order_detail' order.id %}" class="select-btn">جزئیات</a>
+                                <div class="address-actions">
+                                    <a href="" class="select-btn"><i class="fas fa-edit"></i> ویرایش</a>
+                                    <form method="POST" action="" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="remove-item"><i class="fas fa-trash"></i> حذف</button>
+                                    </form>
+                                </div>
                             </div>
                         {% empty %}
-                            <p>هیچ سفارشی یافت نشد.</p>
+                            <p>هیچ آدرسی ثبت نشده است.</p>
                         {% endfor %}
+                    </div>
+                    <div class="new-address-section">
+                        <button class="new-address-btn" id="add-address-btn">
+                            <i class="fas fa-plus"></i> افزودن آدرس جدید
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Edit Profile Modal -->
-    <div class="modal" id="edit-profile-modal">
+    <!-- Add Address Modal -->
+    <div class="modal" id="add-address-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>ویرایش پروفایل</h3>
+                <h3>افزودن آدرس جدید</h3>
                 <span class="close">&times;</span>
             </div>
             <div class="modal-body">
-                <form class="auth-form" method="POST" action="{% url 'profile' %}">
+                <form class="auth-form" method="POST" action="{% url 'addresses' %}">
                     {% csrf_token %}
                     <div class="form-group">
-                        <label for="username">نام کاربری</label>
+                        <label for="city">شهر</label>
                         <div class="input-wrapper">
-                            <i class="fas fa-user"></i>
-                            <input type="text" id="username" name="username" value="{{ user.username }}" readonly>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">ایمیل</label>
-                        <div class="input-wrapper">
-                            <i class="fas fa-envelope"></i>
-                            <input type="email" id="email" name="email" value="{{ user.email }}">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="first_name">نام</label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-user"></i>
-                                <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="last_name">نام خانوادگی</label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-user"></i>
-                                <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone_number">شماره تماس</label>
-                        <div class="input-wrapper">
-                            <i class="fas fa-phone"></i>
-                            <input type="text" id="phone_number" name="phone_number" value="{{ user.phone_number|default:'' }}">
+                            <i class="fas fa-city"></i>
+                            <input type="text" id="city" name="city" required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="address">آدرس</label>
                         <div class="input-wrapper">
                             <i class="fas fa-map-marker-alt"></i>
-                            <textarea id="address" name="address">{{ user.address|default:'' }}</textarea>
+                            <textarea id="address" name="address" required></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="unit">واحد (اختیاری)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-building"></i>
+                            <input type="text" id="unit" name="unit">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="postal_code">کد پستی</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-mail-bulk"></i>
+                            <input type="text" id="postal_code" name="postal_code" required>
                         </div>
                     </div>
                     <button type="submit" class="auth-btn">
-                        <i class="fas fa-save"></i> ذخیره تغییرات
+                        <i class="fas fa-save"></i> ذخیره آدرس
                     </button>
                 </form>
             </div>

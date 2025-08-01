@@ -10,49 +10,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="nav-wrapper">
-                <div class="logo">
-                    <h2>فروشگاه آنلاین</h2>
-                </div>
-
-                <nav class="nav-menu" id="navMenu">
-                    <ul>
-                        <li><a href="{% url 'index' %}">خانه</a></li>
-                        <li><a href="{% url 'products' %}">محصولات</a></li>
-                        <li><a href="{% url 'categories' %}">دسته‌بندی</a></li>
-                        <li><a href="#about">درباره ما</a></li>
-                        <li><a href="#contact">تماس</a></li>
-                        {% if user.is_authenticated %}
-                            <li><a href="{% url 'profile' %}">پروفایل</a></li>
-                            <li><a href="{% url 'logout' %}">خروج</a></li>
-                        {% else %}
-                            <li><a href="{% url 'login' %}">ورود</a></li>
-                            <li><a href="{% url 'register' %}">ثبت نام</a></li>
-                        {% endif %}
-                    </ul>
-                </nav>
-
-                <div class="header-actions">
-                    <div class="search-box">
-                        <form method="GET" action="{% url 'search' %}">
-                            <input type="text" name="q" placeholder="جستجو کنید..." id="searchInput" value="{{ request.GET.q }}">
-                            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
-                        </form>
-                    </div>
-                    <a href="{% url 'cart' %}" class="cart-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count">{{ n }}</span>
-                    </a>
-                    <button class="menu-toggle" id="menuToggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
+{% include 'partials/header.html' %}
 
     <!-- Hero Section -->
     <section class="hero" id="home">
@@ -227,53 +185,7 @@
             </div>
         </div>
     </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>فروشگاه آنلاین</h3>
-                    <p>بهترین فروشگاه آنلاین برای خرید محصولات دیجیتال و الکترونیکی</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-telegram"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <h4>لینک‌های مفید</h4>
-                    <ul>
-                        <li><a href="">درباره ما</a></li>
-                        <li><a href="">تماس با ما</a></li>
-                        <li><a href="">سوالات متداول</a></li>
-                        <li><a href="">شرایط استفاده</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>خدمات مشتریان</h4>
-                    <ul>
-                        <li><a href="">راهنمای خرید</a></li>
-                        <li><a href="">رویه بازگشت کالا</a></li>
-                        <li><a href="">ضمانت‌نامه</a></li>
-                        <li><a href="">پیگیری سفارش</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>تماس با ما</h4>
-                    <div class="contact-info">
-                        <p><i class="fas fa-phone"></i> ۰۲۱-۱۲۳۴۵۶۷۸</p>
-                        <p><i class="fas fa-envelope"></i> info@shop.com</p>
-                        <p><i class="fas fa-map-marker-alt"></i> تهران، خیابان ولیعصر</p>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; ۲۰۲۴ فروشگاه آنلاین. تمام حقوق محفوظ است.</p>
-            </div>
-        </div>
-    </footer>
-
+{% include 'partials/footer.html' %}
     <!-- Messages -->
     {% if messages %}
         {% for message in messages %}

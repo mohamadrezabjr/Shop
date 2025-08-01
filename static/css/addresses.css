@@ -1,0 +1,258 @@
+    /* Addresses Page Styles */
+    .auth-container {
+        width: 100%; /* عرض کامل صفحه */
+        margin: 0; /* حذف حاشیه‌ها */
+        padding: 0; /* حذف پدینگ پیش‌فرض */
+        min-height: calc(100vh - 200px); /* پر کردن ارتفاع صفحه منهای هدر و فوتر */
+        align-content: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 12px ;
+        background: #ffffff; /* پس‌زمینه سفید برای پر کردن صفحه */
+    }
+
+    .auth-card.saved-addresses-section {
+        width: 100%; /* عرض کامل داخل auth-container */
+        margin: 0;
+        padding: 2rem; /* فاصله داخلی برای ظاهر بهتر */
+        background: #ffffff;
+        border-radius: 12px ;
+        box-shadow: none; /* حذف سایه برای ظاهر یکپارچه */
+        min-height: calc(100vh - 200px); /* همگام با auth-container */
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+    }
+
+    .address-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2rem;
+        background: #f8f9fa;
+        border: 2px solid #e1e5e9;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        margin-bottom: .5rem;
+    }
+
+    .address-item:hover {
+        border-color: #2c5aa0;
+        box-shadow: 0 4px 12px rgba(44, 90, 160, 0.2);
+        transform: translateY(-3px);
+    }
+
+    .address-info h5 {
+        color: #2c5aa0;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .address-info p {
+        color: #333;
+        font-size: 1rem;
+    }
+
+    .address-info small {
+        color: #856404;
+        font-size: 1rem;
+    }
+
+    .address-actions {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .address-actions .select-btn,
+    .address-actions .remove-item {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+
+    .new-address-section {
+        text-align: center;
+        margin-top: 3rem;
+    }
+
+    .new-address-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 1.5rem 3rem;
+        border-radius: 12px;
+        font-size: 1.25rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .new-address-btn:hover {
+        background: #218838;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    /* Modal Form Styles */
+    .modal-body textarea {
+        width: 100%;
+        padding: 1.25rem;
+        border: 2px solid #e1e5e9;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        resize: vertical;
+        min-height: 120px;
+        outline: none;
+    }
+
+    .modal-body textarea:focus {
+        border-color: #2c5aa0;
+        box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+    }
+
+    /* Override checkout.css modal styles */
+    #add-address-modal {
+        display: none;
+        position: fixed;
+        z-index: 4000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        pointer-events: auto;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    #add-address-modal[style*="block"],
+    #add-address-modal[style*="block"] .modal-content,
+    #add-address-modal[style*="block"] .modal-header,
+    #add-address-modal[style*="block"] .modal-body,
+    #add-address-modal[style*="block"] .modal-footer {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    #add-address-modal:not([style*="block"]) {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+
+    #add-address-modal:not([style*="block"]) .modal-content,
+    #add-address-modal:not([style*="block"]) .modal-header,
+    #add-address-modal:not([style*="block"]) .modal-body,
+    #add-address-modal:not([style*="block"]) .modal-footer {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+
+    /* Close Button Styles */
+    .modal .close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 1.5rem;
+        color: #333;
+        cursor: pointer;
+        pointer-events: auto;
+        z-index: 4100;
+        transition: color 0.3s ease;
+    }
+
+    .modal .close:hover {
+        color: #dc3545;
+    }
+
+    /* Modal Animation */
+    #add-address-modal .modal-content {
+        transform: scale(0.8);
+        opacity: 0;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    #add-address-modal[style*="block"] .modal-content {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .auth-container {
+            width: 100%;
+            padding: 0;
+            min-height: calc(100vh - 180px);
+        }
+
+        .auth-card.saved-addresses-section {
+            width: 100%;
+            padding: 2rem;
+            min-height: calc(100vh - 180px);
+        }
+
+        .address-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.25rem;
+            padding: 1.5rem;
+        }
+
+        .address-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .address-actions .select-btn,
+        .address-actions .remove-item {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .new-address-btn {
+            padding: 1.25rem 2.5rem;
+            font-size: 1.1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .auth-container {
+            min-height: calc(100vh - 160px);
+        }
+
+        .auth-card.saved-addresses-section {
+            padding: 1.5rem;
+            min-height: calc(100vh - 160px);
+        }
+
+        .address-item {
+            padding: 1.25rem;
+        }
+
+        .address-info h5 {
+            font-size: 1.25rem;
+        }
+
+        .address-info p {
+            font-size: 1.1rem;
+        }
+
+        .address-info small {
+            font-size: 0.9rem;
+        }
+
+        .new-address-btn {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+
+        .modal .close {
+            font-size: 1.2rem;
+            top: 10px;
+            right: 10px;
+        }
+    }

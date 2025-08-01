@@ -74,7 +74,7 @@
                     </div>
 
                     <!-- Login Form -->
-                    <form method="POST" class="auth-form" id="loginForm">
+                    <form method="POST" class="auth-form" id="loginForm" action="{% url 'login' %}?next={{ request.META.HTTP_REFERER }}">
                         {% csrf_token %}
 
                         <!-- Display Form Errors -->

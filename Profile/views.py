@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from Shop.models import *
+from .models import *
 from django.http import Http404
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView
@@ -44,4 +45,37 @@ def order(request, token):
     context = {'order': this_order, 'products': products , 'cart': cart}
 
     return render(request,'order.html', context)
-# Create your views here.
+def addresses(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if request.method == 'POST':
+        address_text = request.POST.get('address')
+        unit = request.POST.get('unit') or 0
+        city = request.POST.get('city')
+        postal_code = request.POST.get('postal_code')
+
+        try :
+            new_address = Address.objects.create(user=request.user,
+                                                address=address_text,
+                                                city=city,
+                                                unit=unit,
+                                                postal_code=postal_code,
+                                                save_address=True)
+            new_address.save()
+        except:
+            return redirect('addresses')
+        else:
+            return redirect('addresses')
+    addresses = Address.objects.filter(user = request.user,save_address = True)
+    context = {'addresses': addresses}
+    return render(request, 'addresses.html', context=context)
+
+
+
+
+
+
+
+
+
+
