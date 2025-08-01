@@ -26,7 +26,7 @@ from django.views.static import serve
 from Profile.views import ResetPassword
 from django.contrib.auth import views as auth_views
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('the_boss/', admin.site.urls),
     path('' , include('Shop.urls')),
     path ('' , include('django.contrib.auth.urls')),
     path ('profile/' , include('Profile.urls') , name='profile'),
