@@ -5,6 +5,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.contrib.auth.models import User
 import string ,random
+from django_resized import ResizedImageField
 
 def code_generator(type = 'P' , length = 7):  # Default for products
         code = type + '-'+''.join(random.choices(string.digits, k = length))
@@ -13,13 +14,13 @@ def code_generator(type = 'P' , length = 7):  # Default for products
 class Category(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(null=True, blank=True)
-    icon = models.ImageField(default='images/no_image.png')
+    icon = ResizedImageField(size=[800,800], quality=85,default='images/no_image.png', upload_to='images/categories')
 
     def __str__(self):
         return self.name
 
 class Image(models.Model):
-    image = models.ImageField(upload_to='images/')
+    image = models.ImageField(upload_to='images/products')
 
     def __str__(self):
         if self.product.first():
@@ -32,7 +33,7 @@ class Product(models.Model):
     date = models.DateTimeField(auto_now_add=True, null = True, blank = True)
     stock = models.IntegerField(default=5)
     condition = models.BooleanField(default=True)
-    image = models.ImageField(default='images/no_image.png',null=True, blank=True)
+    image = ResizedImageField(size=[800,800], quality=85,default='images/no_image.png',null=True, blank=True,upload_to='images/products')
     gallery_images = models.ManyToManyField(Image, related_name='product', blank=True)
     description = models.TextField(null=True, blank=True)
     extra_details = models.TextField(null=True, blank=True, default=None)

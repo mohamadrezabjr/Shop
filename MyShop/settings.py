@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
+    'cloudinary',
     'django.contrib.humanize',
 
     'Shop',
@@ -95,7 +97,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-LOCAL_POSTGRES = True
+LOCAL_POSTGRES = False
 if ENVIRONMENT == 'production' or LOCAL_POSTGRES:
     DATABASE_URL = str(os.getenv('DATABASE_URL'))
     DATABASES['default'] = dj_database_url.parse(DATABASE_URL)
@@ -139,8 +141,17 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+if ENVIRONMENT == 'production' or LOCAL_POSTGRES:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+else:
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': str(os.getenv('CLOUD_NAME')),
+    'API_KEY': str(os.getenv('CLOUD_API_KEY')),
+    'API_SECRET': str(os.getenv('CLOUD_API_SECRET'))
+}
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
