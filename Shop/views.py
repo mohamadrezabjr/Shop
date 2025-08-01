@@ -315,16 +315,15 @@ def checkout(request):
             postal_code = request.POST.get('postal_code')
             address = request.POST.get('address')
             save_address = request.POST.get('save_address')
-            order_address = Address.objects.create(address = address, city=city, unit=unit, postal_code=postal_code, user=user)
+            order_address = Address.objects.create(address = address, city=city, unit=unit, postal_code=postal_code, user=request.user)
             if save_address:
                 order_address.save_address = True
                 order_address.save()
 
-        user = request.user
         notes = request.POST.get('order_notes') or " "
         phone_number = request.POST.get('phone')
 
-        order = Order.objects.create(user=user, price=total, address=order_address, notes=notes, phone_number=phone_number)
+        order = Order.objects.create(user=request.user, price=total, address=order_address, notes=notes, phone_number=phone_number)
         order.products.set(cart_items)
         order.save()
 
