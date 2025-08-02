@@ -22,6 +22,8 @@ def cart_num(r):
 
 
 def register(request):
+    if request.user.is_authenticated:
+        return redirect('index')
     if request.method == "POST":
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
@@ -50,6 +52,15 @@ def register(request):
 
     return render(request, 'registration/register.html',)
 
+def check_username(request):
+    if request.user.is_authenticated:
+        return redirect('index')
+    username = request.GET.get('username')
+    try:
+        user = User.objects.get(username=username)
+        return JsonResponse({'available' : False})
+    except:
+        return JsonResponse({'available' : True})
 
 def logout_view(request):
     logout(request)

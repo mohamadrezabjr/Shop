@@ -8,10 +8,10 @@ urlpatterns = [
     path ('products/<str:token>/' , views.details, name='detail'),
     # path ('products/add_to_cart/<str:token>' , views.add_cart, name='add_to_cart'),
     path ('logout/' , views.logout_view, name='log_out'),
-
     path ('cart/' ,views.cart, name='cart'),
     path('cart/add/<str:token>/', views.add_to_cart, name='add_to_cart'),
     path ('register/' ,views.register,name = 'register' ),
+    path ('check-username/', views.check_username, name='check_username'),
     path ('categories/<str:name>/', views.category_products, name='category_products'),
     path ('checkout/' , views.checkout, name='checkout'),
     path ('search/' , views.search, name='search'),

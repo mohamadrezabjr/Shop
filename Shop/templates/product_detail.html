@@ -13,48 +13,7 @@
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="nav-wrapper">
-                <div class="logo">
-                    <h2>فروشگاه آنلاین</h2>
-                </div>
-
-                <nav class="nav-menu" id="navMenu">
-                    <ul>
-                        <li><a href="{% url 'index' %}">خانه</a></li>
-                        <li><a href="{% url 'products' %}">محصولات</a></li>
-                        <li><a href="{% url 'categories' %}">دسته‌بندی</a></li>
-                        <li><a href="#about">درباره ما</a></li>
-                        <li><a href="#contact">تماس</a></li>
-                        {% if user.is_authenticated %}
-                            <li><a href="{% url 'profile' %}">پروفایل</a></li>
-                            <li><a href="{% url 'logout' %}">خروج</a></li>
-                        {% else %}
-                            <li><a href="{% url 'login' %}">ورود</a></li>
-                            <li><a href="{% url 'register' %}">ثبت نام</a></li>
-                        {% endif %}
-                    </ul>
-                </nav>
-
-                <div class="header-actions">
-                    <div class="search-box">
-                        <form method="GET" action="{% url 'products' %}">
-                            <input type="text" name="search" placeholder="جستجو کنید...">
-                            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
-                        </form>
-                    </div>
-                    <a href="{% url 'cart' %}" class="cart-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count">{{ n }}</span>
-                    </a>
-                    <button class="menu-toggle" id="menuToggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
+    {% include 'partials/header.html' %}
 
     <!-- Breadcrumb -->
     <section class="breadcrumb">
