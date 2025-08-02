@@ -52,7 +52,7 @@ INSTALLED_APPS = [
 
     'Shop',
     'bootstrap5',
-    'Profile'
+    'Profile.apps.ProfileConfig'
 ]
 
 MIDDLEWARE = [

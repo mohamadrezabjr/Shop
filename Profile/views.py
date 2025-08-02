@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from Shop.models import *
 from .models import *
+from Shop.views import cart_num
 from django.http import Http404
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView
@@ -21,18 +22,11 @@ class ResetPassword(PasswordResetView , SuccessMessageMixin):
 def profile(request):
     if not request.user.is_authenticated:
         return redirect('login')
-    n = 0
-    if request.user.is_authenticated:
+    n = cart_num(request)
+    orders = Order.objects.filter(user=request.user).order_by('-date')
+    user = request.user
 
-        cart = Cart.objects.filter(user=request.user, ordered=False)
-        for x in cart:
-            n += x.num
-    order = Order.objects.filter(user=request.user).order_by('-date')
-
-    name = request.user.username
-    email = request.user.email
-
-    context = {'order': order, 'name': name, 'email': email, 'n': n}
+    context = {'orders': orders, 'user': user, 'n': n}
     return render (request , 'profile.html',context)
 
 
@@ -48,6 +42,7 @@ def order(request, token):
 def addresses(request):
     if not request.user.is_authenticated:
         return redirect('login')
+
     if request.method == 'POST':
         address_text = request.POST.get('address')
         unit = request.POST.get('unit') or 0
@@ -65,9 +60,14 @@ def addresses(request):
         except:
             return redirect('addresses')
         else:
+            profile = request.user.profile
+            profile.add(new_address)
+            profile.save()
             return redirect('addresses')
-    addresses = Address.objects.filter(user = request.user,save_address = True)
-    context = {'addresses': addresses}
+
+    n = cart_num(request)
+    addresses = request.user.profile.address.all()
+    context = {'addresses': addresses, 'n':n}
     return render(request, 'addresses.html', context=context)
 
 

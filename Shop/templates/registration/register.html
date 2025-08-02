@@ -11,44 +11,7 @@
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="nav-wrapper">
-                <div class="logo">
-                    <a href="{% url 'index' %}">
-                        <h2>فروشگاه آنلاین</h2>
-                    </a>
-                </div>
-
-                <nav class="nav-menu" id="navMenu">
-                    <ul>
-                        <li><a href="{% url 'index' %}">خانه</a></li>
-                        <li><a href="{% url 'products' %}">محصولات</a></li>
-                        <li><a href="{% url 'categories' %}">دسته‌بندی</a></li>
-                        <li><a href="#about">درباره ما</a></li>
-                        <li><a href="#contact">تماس</a></li>
-                    </ul>
-                </nav>
-
-                <div class="header-actions">
-                    <div class="search-box">
-                        <form method="GET" action="{% url 'products' %}">
-                            <input type="text" name="search" placeholder="جستجو کنید...">
-                            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
-                        </form>
-                    </div>
-                    <a href="{% url 'cart' %}" class="cart-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count">0</span>
-                    </a>
-                    <button class="menu-toggle" id="menuToggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
+{% include 'partials/header.html' %}
     <!-- Breadcrumb -->
     <section class="breadcrumb">
         <div class="container">
@@ -152,12 +115,12 @@
 
                         <!-- Phone Field -->
                         <div class="form-group">
-                            <label for="phone">شماره موبایل</label>
+                            <label for="phone_number">شماره موبایل</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-phone"></i>
                                 <input type="tel" 
-                                       name="phone" 
-                                       id="phone" 
+                                       name="phone_number"
+                                       id="phone_number"
                                        placeholder="09123456789"
                                        value="{{ form.phone.value|default:'' }}"
                                        pattern="09[0-9]{9}"

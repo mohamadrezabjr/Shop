@@ -15,7 +15,6 @@ urlpatterns = [
     path ('categories/<str:name>/', views.category_products, name='category_products'),
     path ('checkout/' , views.checkout, name='checkout'),
     path ('search/' , views.search, name='search'),
-    path ('test/' , views.test),
     path ('password_reset/' ,ResetPassword.as_view() , name='password_reset' ),
 
  ]

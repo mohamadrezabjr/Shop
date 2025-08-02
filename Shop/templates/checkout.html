@@ -476,7 +476,7 @@
                             <div class="order-item">
                                 <div class="item-image">
                                     <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
-                                    <span class="item-quantity">{{ item.quantity }}</span>
+                                    <span class="item-quantity">{{ item.num }}</span>
                                 </div>
                                 <div class="item-details">
                                     <h4>{{ item.product.name }}</h4>
@@ -490,7 +490,7 @@
                                     </div>
                                 </div>
                                 <div class="item-total">
-                                    {{ item.get_total_price|intcomma }} تومان
+                                    {{ item.total_price|intcomma }} تومان
                                 </div>
                             </div>
                             {% endfor %}

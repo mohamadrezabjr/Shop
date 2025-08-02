@@ -13,42 +13,7 @@
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="nav-wrapper">
-                <div class="logo">
-                    <h2>فروشگاه آنلاین</h2>
-                </div>
-                <nav class="nav-menu">
-                    <ul>
-                        <li><a href="{% url 'index' %}">خانه</a></li>
-                        <li><a href="{% url 'products' %}">محصولات</a></li>
-                        <li><a href="{% url 'categories' %}">دسته‌بندی</a></li>
-                        <li><a href="">درباره ما</a></li>
-                        <li><a href="">تماس</a></li>
-                        {% if user.is_authenticated %}
-                            <li><a href="{% url 'profile' %}" class="active">پروفایل</a></li>
-                            <li><a href="{% url 'logout' %}">خروج</a></li>
-                        {% else %}
-                            <li><a href="{% url 'login' %}">ورود</a></li>
-                            <li><a href="{% url 'register' %}">ثبت‌نام</a></li>
-                        {% endif %}
-                    </ul>
-                </nav>
-                <div class="header-actions">
-                    <div class="search-box">
-                        <input type="text" placeholder="جستجوی محصولات...">
-                        <button class="search-btn"><i class="fas fa-search"></i></button>
-                    </div>
-                    <div class="cart-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count">{{ cart_count }}</span>
-                    </div>
-                    <button class="menu-toggle"><i class="fas fa-bars"></i></button>
-                </div>
-            </div>
-        </div>
-    </header>
+{% include 'partials/header.html' %}
 
     <!-- Profile Section -->
     <section class="profile-section auth-section">
@@ -79,11 +44,7 @@
                         </div>
                         <div class="profile-item">
                             <strong>شماره تماس:</strong>
-                            <span>{{ user.phone_number|default:"ثبت نشده" }}</span>
-                        </div>
-                        <div class="profile-item">
-                            <strong>آدرس:</strong>
-                            <span>{{ user.address|default:"ثبت نشده" }}</span>
+                            <span>{{ user.profile.phone_number|default:"ثبت نشده" }}</span>
                         </div>
                     </div>
                     <button class="auth-btn edit-profile-btn" data-action="edit">
@@ -104,12 +65,12 @@
                         {% for order in orders %}
                             <div class="order-item">
                                 <div class="order-info">
-                                    <h4>سفارش #{{ order.id }}</h4>
+                                    <h4>سفارش #{{ order.token }}</h4>
                                     <p>تاریخ: {{ order.date|date:"Y/m/d" }}</p>
-                                    <p>مبلغ: {{ order.total_price|intcomma }} تومان</p>
+                                    <p>مبلغ: {{ order.price|intcomma }} تومان</p>
                                     <p>وضعیت: {{ order.status }}</p>
                                 </div>
-                                <a href="{% url 'order_detail' order.id %}" class="select-btn">جزئیات</a>
+                                <a href="{% url 'order_detail' order.token %}" class="select-btn">جزئیات</a>
                             </div>
                         {% empty %}
                             <p>هیچ سفارشی یافت نشد.</p>
@@ -164,16 +125,10 @@
                         <label for="phone_number">شماره تماس</label>
                         <div class="input-wrapper">
                             <i class="fas fa-phone"></i>
-                            <input type="text" id="phone_number" name="phone_number" value="{{ user.phone_number|default:'' }}">
+                            <input type="text" id="phone_number" name="phone_number" value="{{ user.profile.phone_number|default:'' }}">
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="address">آدرس</label>
-                        <div class="input-wrapper">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <textarea id="address" name="address">{{ user.address|default:'' }}</textarea>
-                        </div>
-                    </div>
+
                     <button type="submit" class="auth-btn">
                         <i class="fas fa-save"></i> ذخیره تغییرات
                     </button>
@@ -183,49 +138,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>فروشگاه آنلاین</h3>
-                    <p>بهترین فروشگاه آنلاین برای خرید محصولات دیجیتال و الکترونیکی</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-telegram"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <h4>لینک‌های مفید</h4>
-                    <ul>
-                        <li><a href="">درباره ما</a></li>
-                        <li><a href="">تماس با ما</a></li>
-                        <li><a href="#">سوالات متداول</a></li>
-                        <li><a href="#">شرایط استفاده</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>خدمات مشتریان</h4>
-                    <ul>
-                        <li><a href="#">راهنمای خرید</a></li>
-                        <li><a href="#">رویه بازگشت کالا</a></li>
-                        <li><a href="#">ضمانت‌نامه</a></li>
-                        <li><a href="#">پیگیری سفارش</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>تماس با ما</h4>
-                    <p><i class="fas fa-phone"></i> ۰۲۱-۱۲۳۴۵۶۷۸</p>
-                    <p><i class="fas fa-envelope"></i> info@shop.com</p>
-                    <p><i class="fas fa-map-marker-alt"></i> تهران، خیابان ولیعصر</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>© ۲۰۲۴ فروشگاه آنلاین. تمام حقوق محفوظ است.</p>
-            </div>
-        </div>
-    </footer>
-
+{% include 'partials/footer.html' %}
     <!-- Messages -->
     {% if messages %}
         <div class="modal" style="display: block;">

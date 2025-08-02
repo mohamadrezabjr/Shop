@@ -66,18 +66,18 @@ class Cart(models.Model):
 
 class Order(models.Model):
     status_choices = (
-        ('Pending', 'در حال پردازش'),
-        ('Confirmed', 'تایید شده'),
-        ('OnTheWay', 'در حال ارسال'),
-        ('Canceled', 'لغو شده'),
-        ('Completed', 'سفارش کامل شده')
+        ( 'درحال پردازش', 'درحال پردازش'),
+        ('تایید شده' ,'تایید شده'),
+        ('در حال ارسال', 'در حال ارسال'),
+        ('لغو شده', 'لغو شده'),
+        ('سفارش کامل شده', 'سفارش کامل شده')
     )
 
-    status = models.CharField(max_length=30, choices=status_choices, default='pending')
+    status = models.CharField(max_length=30, choices=status_choices, default='درحال پردازش')
     products = models.ManyToManyField(Cart)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.ForeignKey('Profile.Address', on_delete=models.CASCADE)
-    price = models.FloatField()
+    price = models.IntegerField()
     date = models.DateTimeField(default=datetime.now)
     phone_number = models.CharField(max_length=11, null=True, blank=True)
     notes = models.TextField(null=True, blank=True)

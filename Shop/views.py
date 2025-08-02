@@ -28,10 +28,18 @@ def register(request):
         username = request.POST.get("username")
         email = request.POST.get("email")
         password = request.POST.get("password1")
+        phone_number = request.POST.get('phone_number')
+
         try:
             user = User.objects.create_user(username=username, email=email, first_name=first_name, last_name=last_name)
             user.set_password(password)
             user.save()
+            # Profile created with signals
+
+            profile = user.profile
+            profile.phone_number = phone_number
+            profile.save()
+
         except IntegrityError:
             messages.error(request, "نام کاربری قبلا انتخاب شده است")
         else:
@@ -218,7 +226,6 @@ def add_to_cart(request, token):
     return redirect('login')
 def calculate_cart_total(request):
     cart = Cart.objects.filter(user=request.user, ordered=False)
-    print(cart)
     # price with discount
     total = 0
     # price without discount
@@ -320,6 +327,11 @@ def checkout(request):
                 order_address.save_address = True
                 order_address.save()
 
+                profile = request.user.profile
+                profile.address.add(order_address)
+                profile.save()
+
+
         notes = request.POST.get('order_notes') or " "
         phone_number = request.POST.get('phone')
 
@@ -362,13 +374,3 @@ def search(request):
     return render(request, 'search.html', context)
 
 
-def test(request):
-    return render(request, 'test.html')
-# TODO
-# 1- register +
-# 2- profile
-# 3- discount
-# 4- more images for details
-# 5- admin panel *
-# 6- in order
-# 7- ordered *

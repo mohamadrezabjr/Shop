@@ -1,209 +1,106 @@
-{% load static %}
-
 <!DOCTYPE html>
-<html lang="fa">
+{% load static %}
+<html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مدیریت آدرس‌ها - فروشگاه آنلاین</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
-    <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+    <title>مدیریت آدرس‌ها</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/addresses.css' %}">
-    <script src="{% static 'js/addresses.js' %}" defer></script>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="nav-wrapper">
-                <div class="logo">
-                    <h2>فروشگاه آنلاین</h2>
+{% include 'partials/header.html' %}
+
+<br>
+<br>
+    <section class="auth-section">
+        <div class="auth-container">
+            <!-- Saved Addresses -->
+            <div class="auth-card saved-addresses-section">
+                <div class="auth-header">
+                    <i class="fas fa-map-marker-alt auth-icon"></i>
+                    <h1>آدرس‌های ذخیره‌شده</h1>
+                    <p>آدرس‌های ثبت‌شده خود را مدیریت کنید</p>
                 </div>
-                <nav class="nav-menu">
-                    <ul>
-                        <li><a href="{% url 'index' %}">خانه</a></li>
-                        <li><a href="{% url 'products' %}">محصولات</a></li>
-                        <li><a href="{% url 'categories' %}">دسته‌بندی</a></li>
-                        <li><a href="">درباره ما</a></li>
-                        <li><a href="">تماس</a></li>
-                        {% if user.is_authenticated %}
-                            <li><a href="{% url 'profile' %}">پروفایل</a></li>
-                            <li><a href="{% url 'addresses' %}" class="active">آدرس‌ها</a></li>
-                            <li><a href="{% url 'logout' %}">خروج</a></li>
-                        {% else %}
-                            <li><a href="{% url 'login' %}">ورود</a></li>
-                            <li><a href="{% url 'register' %}">ثبت‌نام</a></li>
-                        {% endif %}
-                    </ul>
-                </nav>
-                <div class="header-actions">
-                    <div class="search-box">
-                        <input type="text" placeholder="جستجوی محصولات...">
-                        <button class="search-btn"><i class="fas fa-search"></i></button>
-                    </div>
-                    <div class="cart-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count">{{ cart_count }}</span>
-                    </div>
-                    <button class="menu-toggle"><i class="fas fa-bars"></i></button>
+                <div class="saved-addresses-list">
+                    {% for address in addresses reversed%}
+                        <div class="address-item">
+                            <div class="address-info">
+                                <i class="fas fa-city"></i>
+                                <h5>{{ address.city }}</h5>
+                                <p>{{ address.address }}</p>
+                                {% if address.unit %}
+                                    <p>واحد: {{ address.unit }}</p>
+                                {% endif %}
+                                <small class="postal-code">کد پستی: {{ address.postal_code }}</small>
+                            </div>
+                            <div class="address-actions">
+                                <a href="" class="select-btn"><i class="fas fa-edit"></i> ویرایش</a>
+                                <form method="POST" action="" class="delete-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="remove-item"><i class="fas fa-trash"></i> حذف</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="no-address">هیچ آدرسی ثبت نشده است.</p>
+                    {% endfor %}
+                </div>
+                <div class="new-address-section">
+                    <button class="new-address-btn" id="add-address-btn">
+                        <i class="fas fa-plus"></i> افزودن آدرس جدید
+                    </button>
                 </div>
             </div>
-        </div>
-    </header>
-
-    <!-- Addresses Section -->
-    <section class="profile-section auth-section">
-        <div class="container">
-            <h2 class="section-title">مدیریت آدرس‌ها</h2>
-            <div class="auth-container">
-                <!-- Saved Addresses -->
-                <div class="auth-card saved-addresses-section">
-                    <div class="auth-header">
-                        <div class="auth-icon">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <h1>آدرس‌های ذخیره‌شده</h1>
-                        <p>آدرس‌های ثبت‌شده خود را مشاهده کنید</p>
+            <!-- Add Address Modal -->
+            <div class="modal" id="add-address-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>افزودن آدرس جدید</h3>
+                        <span class="close">&times;</span>
                     </div>
-                    <div class="saved-addresses-list">
-                        {% for address in addresses %}
-                            <div class="address-item">
-                                <div class="address-info">
-                                    <h5>{{ address.city }}</h5>
-                                    <p>{{ address.address }}</p>
-                                    {% if address.unit %}
-                                        <p>واحد: {{ address.unit }}</p>
-                                    {% endif %}
-                                    <small class="postal-code">کد پستی: {{ address.postal_code }}</small>
-                                </div>
-                                <div class="address-actions">
-                                    <a href="" class="select-btn"><i class="fas fa-edit"></i> ویرایش</a>
-                                    <form method="POST" action="" style="display:inline;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="remove-item"><i class="fas fa-trash"></i> حذف</button>
-                                    </form>
+                    <div class="modal-body">
+                        <form class="auth-form" method="POST" action="{% url 'addresses' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="city"> شهر  <i class="fas fa-city" style="color: #2c5aa0"> </i></label>
+                                <div class="input-wrapper">
+
+                                    <input type="text" id="city" name="city" required>
                                 </div>
                             </div>
-                        {% empty %}
-                            <p>هیچ آدرسی ثبت نشده است.</p>
-                        {% endfor %}
-                    </div>
-                    <div class="new-address-section">
-                        <button class="new-address-btn" id="add-address-btn">
-                            <i class="fas fa-plus"></i> افزودن آدرس جدید
-                        </button>
+                            <div class="form-group">
+                                <label for="address"> آدرس  <i class="fas fa-map-marker-alt" style="color: #2c5aa0"></i></label>
+                                <div class="input-wrapper">
+
+                                    <textarea id="address" name="address" required></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="unit"> واحد (اختیاری)<i class="fas fa-building" style="color: #2c5aa0"></i></label>
+                                <div class="input-wrapper">
+
+
+                                    <input type="text" id="unit" name="unit">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="postal_code"> کد پستی  <i class="fas fa-mail-bulk" style="color: #2c5aa0"></i></label>
+                                <div class="input-wrapper">
+
+                                        <input type="text" id="postal_code" name="postal_code" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="auth-btn">
+                                <i class="fas fa-save"></i> ذخیره آدرس
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Add Address Modal -->
-    <div class="modal" id="add-address-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>افزودن آدرس جدید</h3>
-                <span class="close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form class="auth-form" method="POST" action="{% url 'addresses' %}">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="city">شهر</label>
-                        <div class="input-wrapper">
-                            <i class="fas fa-city"></i>
-                            <input type="text" id="city" name="city" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="address">آدرس</label>
-                        <div class="input-wrapper">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <textarea id="address" name="address" required></textarea>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="unit">واحد (اختیاری)</label>
-                        <div class="input-wrapper">
-                            <i class="fas fa-building"></i>
-                            <input type="text" id="unit" name="unit">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="postal_code">کد پستی</label>
-                        <div class="input-wrapper">
-                            <i class="fas fa-mail-bulk"></i>
-                            <input type="text" id="postal_code" name="postal_code" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="auth-btn">
-                        <i class="fas fa-save"></i> ذخیره آدرس
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>فروشگاه آنلاین</h3>
-                    <p>بهترین فروشگاه آنلاین برای خرید محصولات دیجیتال و الکترونیکی</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-telegram"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <h4>لینک‌های مفید</h4>
-                    <ul>
-                        <li><a href="">درباره ما</a></li>
-                        <li><a href="">تماس با ما</a></li>
-                        <li><a href="#">سوالات متداول</a></li>
-                        <li><a href="#">شرایط استفاده</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>خدمات مشتریان</h4>
-                    <ul>
-                        <li><a href="#">راهنمای خرید</a></li>
-                        <li><a href="#">رویه بازگشت کالا</a></li>
-                        <li><a href="#">ضمانت‌نامه</a></li>
-                        <li><a href="#">پیگیری سفارش</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>تماس با ما</h4>
-                    <p><i class="fas fa-phone"></i> ۰۲۱-۱۲۳۴۵۶۷۸</p>
-                    <p><i class="fas fa-envelope"></i> info@shop.com</p>
-                    <p><i class="fas fa-map-marker-alt"></i> تهران، خیابان ولیعصر</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>© ۲۰۲۴ فروشگاه آنلاین. تمام حقوق محفوظ است.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Messages -->
-    {% if messages %}
-        <div class="modal" style="display: block;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>پیام‌ها</h3>
-                    <span class="close">&times;</span>
-                </div>
-                <div class="modal-body">
-                    {% for message in messages %}
-                        <p class="error-message">{{ message }}</p>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    {% endif %}
+{% include 'partials/footer.html' %}
+    <script src="{% static 'js/addresses.js' %}"></script>
 </body>
 </html>
