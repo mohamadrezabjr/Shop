@@ -22,6 +22,24 @@ class ResetPassword(PasswordResetView , SuccessMessageMixin):
 def profile(request):
     if not request.user.is_authenticated:
         return redirect('login')
+    if request.method == "POST":
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        phone_number = request.POST.get('phone_number')
+
+        profile = request.user.profile
+        profile.phone_number = phone_number
+        profile.save()
+
+        user = request.user
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        user.save()
+
+        return redirect('profile')
+
     n = cart_num(request)
     orders = Order.objects.filter(user=request.user).order_by('-date')
     user = request.user
