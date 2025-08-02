@@ -68,8 +68,8 @@
                                     <h4>سفارش #{{ order.token }}</h4>
                                     <p>تاریخ: {{ order.date|date:"Y/m/d" }}</p>
                                     <p>مبلغ: {{ order.price|intcomma }} تومان</p>
-                                    <p>وضعیت: {{ order.status }}</p>
-                                </div>
+                        <span class="info-label">وضعیت:</span>
+                        <span class="info-value status {{order.status}}">{{ order.get_status_display }}</span>                                </div>
                                 <a href="{% url 'order_detail' order.token %}" class="select-btn">جزئیات</a>
                             </div>
                         {% empty %}

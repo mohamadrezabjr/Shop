@@ -65,15 +65,14 @@ class Cart(models.Model):
         return (f"{self.num} of {self.product.name} for {self.user.username} ")
 
 class Order(models.Model):
-    status_choices = (
-        ( 'درحال پردازش', 'درحال پردازش'),
-        ('تایید شده' ,'تایید شده'),
-        ('در حال ارسال', 'در حال ارسال'),
-        ('لغو شده', 'لغو شده'),
-        ('سفارش کامل شده', 'سفارش کامل شده')
+    STATUS_CHOICES = (
+        ('pending', 'درحال پردازش'),
+        ('confirmed', 'تایید شده'),
+        ('ontheway', 'در حال ارسال'),
+        ('cancelled', 'لغو شده'),
+        ('completed', 'سفارش کامل شده'),
     )
-
-    status = models.CharField(max_length=30, choices=status_choices, default='درحال پردازش')
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='pending')
     products = models.ManyToManyField(Cart)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.ForeignKey('Profile.Address', on_delete=models.CASCADE)

@@ -30,15 +30,22 @@ def profile(request):
     return render (request , 'profile.html',context)
 
 
-def order(request, token):
+def order_detail(request, token):
     this_order = get_object_or_404(Order,token=token)
     if this_order.user != request.user:
         raise Http404
-    cart = Cart.objects.filter(order =this_order)
+    cart_items = Cart.objects.filter(order =this_order)
     products = Product.objects.filter(cart__order= this_order)
-    context = {'order': this_order, 'products': products , 'cart': cart}
+    context = {'order': this_order, 'products': products , 'cart_items': cart_items}
 
-    return render(request,'order.html', context)
+    return render(request, 'order_detail.html', context)
+def order_cancel(request, token):
+    this_order = get_object_or_404(Order,token=token)
+    if this_order.user != request.user:
+        raise Http404
+    this_order.status = 'cancelled'
+    this_order.save()
+    return redirect('order_detail', token=token)
 def addresses(request):
     if not request.user.is_authenticated:
         return redirect('login')

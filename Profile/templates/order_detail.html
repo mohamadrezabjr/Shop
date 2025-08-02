@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+{% load static %}
+{% load humanize %}
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جزئیات سفارش</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/order_detail.css' %}">
+</head>
+<body>
+{% include 'partials/header.html' %}
+<br>
+<br>
+
+    <section class="order-section">
+        <div class="order-container">
+            <div class="order-header" style="padding-left: 10px">
+                <i class="fas fa-shopping-cart order-icon"></i>
+                <h1>جزئیات سفارش #{{ order.token }}</h1>
+                <p>اطلاعات سفارش شما در تاریخ {{ order.date|date:"Y-m-d H:i" }}</p>
+            </div>
+
+            <div class="order-details-card">
+                <div class="order-info">
+                    <div class="info-item">
+                        <span class="info-label">وضعیت:</span>
+                        <span class="info-value status {{order.status}}">{{ order.get_status_display }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">کل مبلغ:</span>
+                        <span class="info-value total">{{ order.price |intcomma }} تومان</span>
+                    </div>
+                    <br>
+                    <div class="info-item" >
+                        <span class="info-label">آدرس تحویل:</span>
+                        <span class="info-value">{{ order.address.address|default:"ثبت نشده" }}</span>
+                    </div>
+
+                    <div class="info-item" >
+                        <span class="info-label">شماره :</span>
+                        <span class="info-value">{{ order.phone_number|default:"ثبت نشده" }}</span>
+                    </div>
+                </div>
+                <div class="order-items">
+                    <h3>اقلام سفارش</h3>
+                    <ul class="items-list">
+                        {% for item in cart_items %}
+                            <a style="text-decoration: none;" href="{%  url 'detail' item.product.token %}">
+                            <li class="item-row">
+                                <img src="{{ item.product.image.url|default:'/static/images/default-product.jpg' }}" alt="{{ item.product_name }}" class="item-image">
+                                <span class="item-name">{{ item.product.name }}</span>
+                                <span class="item-quantity">تعداد: {{ item.num }}</span>
+                                <span class="item-price">{{ item.total_price | intcomma }} تومان</span>
+                            </li>
+                            </a>
+                        {% endfor %}
+                    </ul>
+                    <div class="order-total">
+                        <span>جمع کل:</span>
+                        <span>{{ order.price | intcomma }} تومان</span>
+                    </div>
+                </div>
+                {% if order.status == 'pending' %}
+                    <form  method = 'POST' action="{% url 'order_cancel' order.token %}" onsubmit="return cancelOrder()">
+                    {% csrf_token %}
+                    <button class="cancel-btn" >
+                        <i class="fas fa-times"></i> لغو سفارش
+                    </button>
+                    </form>
+
+                {% endif %}
+                <a href="{% url 'profile' %}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> بازگشت به لیست سفارش‌ها
+                </a>
+            </div>
+        </div>
+    </section>
+    <script src="{% static 'js/order_detail.js' %}"></script>
+</body>
+</html>

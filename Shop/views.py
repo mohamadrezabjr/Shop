@@ -36,8 +36,8 @@ def register(request):
             user = User.objects.create_user(username=username, email=email, first_name=first_name, last_name=last_name)
             user.set_password(password)
             user.save()
-            # Profile created with signals
 
+            # Profile created with signals
             profile = user.profile
             profile.phone_number = phone_number
             profile.save()

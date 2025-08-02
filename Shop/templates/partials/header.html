@@ -1,6 +1,7 @@
+
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <header class="header">
+<header class="header">
         <div class="container">
             <div class="nav-wrapper">
                 <div class="logo">
@@ -10,7 +11,7 @@
                 <nav class="nav-menu" id="navMenu">
                     <ul>
                         <li><a href="{% url 'index' %}">خانه</a></li>
-                        <li><a href="{% url 'products' %}">محصولات</a></li>
+                        <li><a href="{% url 'products' %}" class="active">محصولات</a></li>
                         <li><a href="{% url 'categories' %}">دسته‌بندی</a></li>
                         <li><a href="#about">درباره ما</a></li>
                         <li><a href="#contact">تماس</a></li>
@@ -26,8 +27,8 @@
 
                 <div class="header-actions">
                     <div class="search-box">
-                        <form method="GET" action="{% url 'search' %}">
-                            <input type="text" name="q" placeholder="جستجو کنید..." id="searchInput" value="{{ request.GET.q }}">
+                        <form method="GET" action="{% url 'products' %}">
+                            <input type="text" name="search" placeholder="جستجو کنید..." value="{{ request.GET.search }}">
                             <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
                         </form>
                     </div>
