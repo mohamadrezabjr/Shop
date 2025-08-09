@@ -97,6 +97,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 LOCAL_POSTGRES = False
 if ENVIRONMENT == 'production' or LOCAL_POSTGRES:
     DATABASE_URL = str(os.getenv('DATABASE_URL'))
