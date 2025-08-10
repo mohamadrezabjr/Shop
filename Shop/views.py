@@ -11,6 +11,7 @@ from .models import *
 from django.contrib import messages
 import json
 from .forms import *
+from django_ratelimit.decorators import ratelimit
 
 def cart_num(r):
     n = 0
@@ -20,7 +21,7 @@ def cart_num(r):
             n += x.num
     return n
 
-
+@ratelimit(key='ip', rate='5/m', block=True)
 def register(request):
     if request.user.is_authenticated:
         return redirect('index')
@@ -51,6 +52,17 @@ def register(request):
             return redirect("index")
 
     return render(request, 'registration/register.html',)
+# def signin(request):
+#     if request.user.is_authenticated:
+#         return redirect('index')
+#     if request.method == "POST":
+#         username = request.POST.get("username")
+#         password = request.POST.get("password")
+#         user = authenticate(username=username, password=password)
+#         if user is not None:
+#             login(request, user)
+#         return redirect("index")
+#     return render(request, 'registration/login.html')
 
 def check_username(request):
     if request.user.is_authenticated:
@@ -65,7 +77,7 @@ def check_username(request):
 def logout_view(request):
     logout(request)
     return redirect("/")
-
+@ratelimit(key='ip', rate='5/s', block=True)
 def index(request):
     n = cart_num(request)
     products = Product.objects.all()
@@ -73,7 +85,7 @@ def index(request):
     context = {"products" : products, 'n': n, "categories": categories }
     return render(request, 'index.html', context)
 
-
+@ratelimit(key='ip', rate='10/s', block=True)
 def products(request):
     n = cart_num(request)
     min_price = request.GET.get('min_price')
@@ -105,14 +117,14 @@ def products(request):
         products = products.order_by('date')
     return render(request, 'products.html', {'products': products, 'n': n})
 
-
+@ratelimit(key='ip', rate='10/s', block=True)
 def categories(request):
     category = Category.objects.all()
     n = cart_num(request)
     context = {'categories': category, 'n': n}
     return render(request, 'categories.html', context)
 
-
+@ratelimit(key='ip', rate='10/s', block=True)
 def category_products(request, name):
     category = Category.objects.filter(name__iexact=name).first()
     if not category:
@@ -155,7 +167,7 @@ def category_products(request, name):
     context = {'products': products, 'category': category, 'n': n}
     return render(request, 'category_products.html', context)
 
-
+@ratelimit(key='ip', rate='10/s', block=True)
 def details(request, token):
 
     if request.method == 'POST':
@@ -185,7 +197,7 @@ def details(request, token):
     context = {'product': this_product, 'related_products' : related_products, 'n': n,  'extra': extra}
 
     return render(request, "product_detail.html", context=context)
-
+@ratelimit(key='ip', rate='2/s', block=True)
 def add_to_cart(request, token):
     if request.user.is_authenticated:
         referer = request.META.get('HTTP_REFERER')
@@ -251,7 +263,7 @@ def calculate_cart_total(request):
         'shipping': int(shipping_price),
         'total': int(total)
     }
-
+@ratelimit(key='ip', rate='5/s', block=True)
 def cart(request):
     if request.user.is_authenticated:
 
@@ -314,7 +326,7 @@ def cart(request):
 
 
 
-
+@ratelimit(key='ip', rate='10/s', block=True)
 def checkout(request):
 
     total = calculate_cart_total(request)['total']

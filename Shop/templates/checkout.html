@@ -153,11 +153,12 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="phone">شماره موبایل *</label>
-                                    <input type="tel" 
+                                    <input type="tel"
                                            name="phone" 
-                                           id="phone" 
+                                           id="phone"
+                                           value="{% if user.profile.phone_number %}{{ user.profile.phone_number}}{% endif %}"
                                            placeholder="09123456789"
-                                           pattern="09[0-9]{9}"
+                                           pattern="[0-9]{10}"
                                            required>
                                 </div>
                             </div>
