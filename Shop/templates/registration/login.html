@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
+{% load custom_filters %}
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -35,9 +36,13 @@
                         <h1>ورود به حساب کاربری</h1>
                         <p>به فروشگاه آنلاین خوش آمدید</p>
                     </div>
-
+                {% url 'login' as login_url %}
                     <!-- Login Form -->
+                    {% if request.META.HTTP_REFERER|endswith_path:login_url %}
+                    <form method="POST" class="auth-form" id="loginForm" action="{% url 'login' %}?next={% url 'index' %}">
+                    {% else %}
                     <form method="POST" class="auth-form" id="loginForm" action="{% url 'login' %}?next={{ request.META.HTTP_REFERER }}">
+                    {% endif %}
                         {% csrf_token %}
 
                         <!-- Display Form Errors -->
