@@ -309,8 +309,12 @@
                                             </button>
                                         </form>
 
-                                        <button class="wishlist-btn" onclick="toggleWishlist({{ product.id }})">
-                                            <i class="far fa-heart"></i>
+                                        <button class="wishlist-btn" onclick="toggleWishlist({{ product.id }}, event)">
+                                            {% if product in request.user.profile.wishlist.all %}
+                                                <i class="fas fa-heart" style="border-color: #e74c3c; color:#e74c3c "></i>
+                                            {% else %}
+                                                <i class="far fa-heart"></i>
+                                            {% endif %}
                                         </button>
 
                                         <a href="{% url 'detail' product.token %}" class="quick-view-btn">

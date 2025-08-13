@@ -187,7 +187,7 @@ function shareProduct(platform) {
 
 // Toggle Wishlist
 function toggleWishlist(productId) {
-  fetch(`/wishlist/toggle/${productId}/`, {
+  fetch(`/profile/wishlist/toggle/${productId}/`, {
     method: "POST",
     headers: {
       "X-CSRFToken": getCookie("csrftoken"),
@@ -201,16 +201,20 @@ function toggleWishlist(productId) {
         const icon = btn.querySelector("i")
 
         if (data.added) {
+          btn.innerHTML = "<i class=\"fas fa-heart\" ></i>حذف از علاقه‌مندی‌ها"
           icon.classList.remove("far")
           icon.classList.add("fas")
           btn.style.borderColor = "#e74c3c"
           btn.style.color = "#e74c3c"
+
           showNotification("به لیست علاقه‌مندی‌ها اضافه شد", "success")
         } else {
+          btn.innerHTML = "<i class=\"far fa-heart\" ></i>افزودن به علاقه‌مندی‌ها"
           icon.classList.remove("fas")
           icon.classList.add("far")
           btn.style.borderColor = "#ddd"
           btn.style.color = "#666"
+
           showNotification("از لیست علاقه‌مندی‌ها حذف شد", "info")
         }
       }
@@ -287,10 +291,7 @@ function getCookie(name) {
 // بهبود تابع showNotification
 function showNotification(message, type = "info") {
   // اگر تابع اصلی showNotification موجود است، از آن استفاده کن
-  if (window.showNotification && typeof window.showNotification === "function") {
-    window.showNotification(message, type)
-    return
-  }
+
 
   // در غیر این صورت notification ساده ایجاد کن
   const notification = document.createElement("div")

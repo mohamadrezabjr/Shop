@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from Shop.models import *
 from .models import *
 from Shop.views import cart_num
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
@@ -64,6 +64,36 @@ def order_cancel(request, token):
     this_order.status = 'cancelled'
     this_order.save()
     return redirect('order_detail', token=token)
+
+def wishlist_toggle(request, product_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({
+                    'authenticated': False,
+                    'success': False
+                   })
+    if request.method == "POST":
+        product= Product.objects.get(id=product_id)
+        profile = request.user.profile
+        wishlist = profile.wishlist.all()
+        if product in wishlist:
+            profile.wishlist.remove(product)
+            profile.save()
+            return JsonResponse({
+                'authenticated': True,
+                'success': True,
+                'added':False
+                })
+
+        profile.wishlist.add(product)
+        profile.save()
+        return JsonResponse({
+            'authenticated': True,
+            'success': True,
+            'added':True
+        })
+    return redirect('index')
+
+
 def addresses(request):
     if not request.user.is_authenticated:
         return redirect('login')

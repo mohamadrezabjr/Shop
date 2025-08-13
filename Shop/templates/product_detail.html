@@ -161,11 +161,21 @@
                                         افزودن به سبد خرید
                                     {% endif %}
                                 </button>
-                                
-                                <button type="button" class="wishlist-btn" onclick="toggleWishlist({{ product.id }})">
-                                    <i class="far fa-heart"></i>
-                                    افزودن به علاقه‌مندی‌ها
-                                </button>
+                                {% if product in request.user.profile.wishlist.all %}
+                                <button type="button" class="wishlist-btn" style="border-color: rgb(231, 76, 60); color: rgb(231, 76, 60);" onclick="toggleWishlist({{ product.id }})">
+
+                                        <i class="fas fa-heart" style="border-color: #e74c3c; color:#e74c3c "></i>
+                                        حذف از علاقه‌مندی‌ها
+                                    </button>
+                                {% else %}
+                              <button type="button" class="wishlist-btn" style="border-color: rgb(221, 221, 221); color: rgb(102, 102, 102);" onclick="toggleWishlist({{ product.id }})">
+
+                                    <i class="far fa-heart" ></i>افزودن به علاقه‌مندی‌ها
+
+                              </button>
+
+                                    {% endif %}
+
                             </div>
                         </form>
                     </div>

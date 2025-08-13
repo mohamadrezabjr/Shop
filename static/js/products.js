@@ -147,9 +147,9 @@ function removeFilter(param, value) {
 }
 
 // Toggle wishlist
-function toggleWishlist(productId) {
+function toggleWishlist(productId, event) {
   // This would typically make an AJAX call to Django
-  fetch(`/wishlist/toggle/${productId}/`, {
+  fetch(`/profile/wishlist/toggle/${productId}/`, {
     method: "POST",
     headers: {
       "X-CSRFToken": getCookie("csrftoken"),
@@ -158,25 +158,31 @@ function toggleWishlist(productId) {
   })
     .then((response) => response.json())
     .then((data) => {
-      if (data.success) {
-        const btn = event.target.closest(".wishlist-btn")
-        const icon = btn.querySelector("i")
+      if (data.authenticated){
+        if (data.success) {
+          const btn = event.target.closest(".wishlist-btn")
+          const icon = btn.querySelector("i")
 
-        if (data.added) {
-          icon.classList.remove("far")
-          icon.classList.add("fas")
-          btn.style.color = "#e74c3c"
-          alert("به لیست علاقه‌مندی‌ها اضافه شد") // Temporary solution for showNotification
-        } else {
-          icon.classList.remove("fas")
-          icon.classList.add("far")
-          btn.style.color = ""
-          alert("از لیست علاقه‌مندی‌ها حذف شد") // Temporary solution for showNotification
+          if (data.added) {
+            icon.classList.remove("far")
+            icon.classList.add("fas")
+            btn.style.color = "#e74c3c"
+            showNotification("به لیست علاقه‌مندی‌ها اضافه شد", 'success') // Temporary solution for showNotification
+          } else {
+            icon.classList.remove("fas")
+            icon.classList.add("far")
+            btn.style.color = ""
+            showNotification("از لیست علاقه‌مندی‌ها حذف شد", 'info') // Temporary solution for showNotification
+          }
         }
+
+      }
+      else {
+        showNotification('لطفا وارد حساب خود شوید.', 'error')
       }
     })
     .catch((error) => {
-      alert("خطا در عملیات") // Temporary solution for showNotification
+      showNotification("خطا در عملیات", 'error') // Temporary solution for showNotification
     })
 }
 
@@ -197,6 +203,58 @@ function getCookie(name) {
 }
 
 // Temporary function to simulate showNotification
-function showNotification(message, type) {
-  alert(message) // This is a placeholder for demonstration purposes
+function showNotification(message, type = "info") {
+  // اگر تابع اصلی showNotification موجود است، از آن استفاده کن
+
+
+  // در غیر این صورت notification ساده ایجاد کن
+  const notification = document.createElement("div")
+
+  let backgroundColor = "#2c5aa0"
+  switch (type) {
+    case "success":
+      backgroundColor = "#28a745"
+      break
+    case "error":
+      backgroundColor = "#dc3545"
+      break
+    case "warning":
+      backgroundColor = "#ffc107"
+      break
+    case "info":
+      backgroundColor = "#17a2b8"
+      break
+  }
+
+  notification.style.cssText = `
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: ${backgroundColor};
+    color: ${type === "warning" ? "#000" : "#fff"};
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    z-index: 3000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-width: 300px;
+    word-wrap: break-word;
+  `
+  notification.textContent = message
+
+  document.body.appendChild(notification)
+
+  setTimeout(() => {
+    notification.style.transform = "translateX(0)"
+  }, 100)
+
+  setTimeout(() => {
+    notification.style.transform = "translateX(100%)"
+    setTimeout(() => {
+      if (document.body.contains(notification)) {
+        document.body.removeChild(notification)
+      }
+    }, 300)
+  }, 3000)
 }
