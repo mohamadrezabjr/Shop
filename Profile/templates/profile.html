@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>پروفایل کاربر - فروشگاه آنلاین</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/auth.css' %}">
     <link rel="stylesheet" href="{% static 'css/profile.css' %}">
@@ -50,6 +51,33 @@
                     <button class="auth-btn edit-profile-btn" data-action="edit">
                         <i class="fas fa-edit"></i> ویرایش پروفایل
                     </button>
+                    <br>
+                    <div class="auth-header">
+                        <div class="auth-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h1>لیست علاقه‌مندی</h1>
+                        <p>مشاهده لبست محصولات موردعلاقه شما</p>
+                        <br>
+                        <a href="{% url 'wishlist' %}" style="text-decoration: none">
+                        <button class="auth-btn edit-profile-btn" data-action="edit">
+                        <i class="fas fa-eye"></i> مشاهده
+                    </button>
+                        </a>
+                    </div>
+                    <div class="auth-header">
+                        <div class="auth-icon">
+                            <i class="fas fa-location  "></i>
+                        </div>
+                        <h1>آدرس ها</h1>
+                        <p>مشاهده آدرس های شما</p>
+                        <br>
+                        <a href="{% url 'addresses' %}" style="text-decoration: none">
+                        <button class="auth-btn edit-profile-btn" data-action="edit">
+                        <i class="fas fa-eye"></i> مشاهده
+                    </button>
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Order History -->

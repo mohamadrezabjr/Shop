@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django_ratelimit.decorators import ratelimit
 from Shop.models import *
 from .models import *
 from Shop.views import cart_num
@@ -6,7 +7,7 @@ from django.http import Http404, JsonResponse
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
-
+from django.db.models import Q
 
 class ResetPassword(PasswordResetView , SuccessMessageMixin):
     template_name = 'password_reset_form.html'
@@ -18,7 +19,7 @@ class ResetPassword(PasswordResetView , SuccessMessageMixin):
                       "please make sure you've entered the address you registered with, and check your spam folder."
     success_url = reverse_lazy('password_reset_done')
 
-
+@ratelimit(key='ip', rate='10/s', block=True)
 def profile(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -47,7 +48,7 @@ def profile(request):
     context = {'orders': orders, 'user': user, 'n': n}
     return render (request , 'profile.html',context)
 
-
+@ratelimit(key='ip', rate='10/s', block=True)
 def order_detail(request, token):
     this_order = get_object_or_404(Order,token=token)
     if this_order.user != request.user:
@@ -57,6 +58,7 @@ def order_detail(request, token):
     context = {'order': this_order, 'products': products , 'cart_items': cart_items}
 
     return render(request, 'order_detail.html', context)
+@ratelimit(key='ip', rate='10/s', block=True)
 def order_cancel(request, token):
     this_order = get_object_or_404(Order,token=token)
     if this_order.user != request.user:
@@ -65,6 +67,54 @@ def order_cancel(request, token):
     this_order.save()
     return redirect('order_detail', token=token)
 
+@ratelimit(key='ip', rate='10/s', block=True)
+def wishlist(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    n = cart_num(request)
+    wishlist_products = request.user.profile.wishlist.all()
+    if wishlist_products.exists():
+        empty = False
+    else:
+        empty = True
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    has_discount = request.GET.get('has_discount')
+    in_stock = request.GET.get('in_stock')
+    search = request.GET.get('search')
+    sort = request.GET.get('sort')
+
+    if not min_price:
+        min_price = 0
+    if not max_price:
+        max_price = 999999999999999
+
+    wishlist_products = wishlist_products.filter(
+        Q(price__gte=min_price, price__lte=max_price) | Q(sale_price__gte=min_price, sale_price__lte=max_price))
+
+    if has_discount:
+        wishlist_products = wishlist_products.filter(discount__gt=0)
+    if search:
+        wishlist_products = wishlist_products.filter(name__icontains=search)
+    if in_stock :
+        wishlist_products = wishlist_products.filter(stock__gte=1)
+
+    # Sorting
+    if sort == "price_high":
+        wishlist_products = wishlist_products.order_by('-sale_price')
+    elif sort == "price_low":
+        wishlist_products = wishlist_products.order_by('sale_price')
+    elif sort == "newest":
+        wishlist_products = wishlist_products.order_by('-date')
+    elif sort == "oldest":
+        wishlist_products = wishlist_products.order_by('date')
+
+
+
+    context = {'wishlist_products': wishlist_products, 'empty': empty,'n':n}
+    return render(request, 'wishlist.html', context)
+@ratelimit(key='ip', rate='10/s', block=True)
 def wishlist_toggle(request, product_id):
     if not request.user.is_authenticated:
         return JsonResponse({
@@ -92,8 +142,22 @@ def wishlist_toggle(request, product_id):
             'added':True
         })
     return redirect('index')
-
-
+@ratelimit(key='ip', rate='10/s', block=True)
+def wishlist_remove(request, product_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if request.method == "POST":
+        product = Product.objects.get(id=product_id)
+        profile = request.user.profile
+        profile.wishlist.remove(product)
+        profile.save()
+        return JsonResponse({
+            'success': True,
+            'authenticated': True,
+            'removed': True
+        })
+    return redirect('index')
+@ratelimit(key='ip', rate='10/s', block=True)
 def addresses(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -116,7 +180,7 @@ def addresses(request):
             return redirect('addresses')
         else:
             profile = request.user.profile
-            profile.add(new_address)
+            profile.address.add(new_address)
             profile.save()
             return redirect('addresses')
 
@@ -124,13 +188,6 @@ def addresses(request):
     addresses = request.user.profile.address.all()
     context = {'addresses': addresses, 'n':n}
     return render(request, 'addresses.html', context=context)
-
-
-
-
-
-
-
 
 
 

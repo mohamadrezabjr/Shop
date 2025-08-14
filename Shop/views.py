@@ -91,6 +91,7 @@ def products(request):
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     has_discount = request.GET.get('has_discount')
+    in_stock = request.GET.get('in_stock')
     search = request.GET.get('search')
     sort = request.GET.get('sort')
 
@@ -105,6 +106,8 @@ def products(request):
         products =products.filter(discount__gt= 0)
     if search :
         products = products.filter(name__icontains=search)
+    if in_stock :
+        products = products.filter(stock__gte=1)
 
     # Sorting
     if sort == "price_high" :
@@ -191,7 +194,7 @@ def details(request, token):
 
     this_product = get_object_or_404(Product, token=token)
     category = this_product.category
-    related_products = Product.objects.filter(category=category)
+    related_products = Product.objects.filter(category=category).exclude(id=this_product.id)
     n = cart_num(request)
     extra = this_product.extra_details.split('\n')
     context = {'product': this_product, 'related_products' : related_products, 'n': n,  'extra': extra}

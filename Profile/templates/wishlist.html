@@ -1,83 +1,34 @@
-<!DOCTYPE html>
 {% load static %}
 {% load humanize %}
+
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ category.name }} - فروشگاه آنلاین</title>
+    <title>لیست علاقه‌مندی‌ها</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/products.css' %}">
-    <link rel="stylesheet" href="{% static 'css/category.css' %}">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/wishlist.css' %}">
+    <script src="{% static 'js/wishlist.js' %}" defer></script>
+    <script src="{% static 'js/products.js' %}" defer></script>
+    <script src="{% static 'js/script.js' %}" defer></script>
+
+
 </head>
 <body>
-    <!-- Header -->
-        {% include 'partials/header.html' %}
-
-
-    <!-- Breadcrumb -->
-    <section class="breadcrumb">
+{% include 'partials/header.html' %}
+    <div class="breadcrumb">
         <div class="container">
             <nav class="breadcrumb-nav">
                 <a href="{% url 'index' %}">خانه</a>
                 <span>/</span>
-                <a href="{% url 'categories' %}">دسته‌بندی‌ها</a>
-                <span>/</span>
-                <span>{{ category.name }}</span>
+                <span>لیست علاقه‌مندی‌ها</span>
             </nav>
         </div>
-    </section>
+    </div>
 
-    <!-- Category Header -->
-    <section class="category-header">
-        <div class="container">
-            <div class="category-info">
-                <div class="category-details">
-                    <div class="category-icon">
-                        <i class="{{ category.icon }}"></i>
-                    </div>
-                    <div class="category-text">
-                        <h1>{{ category.name }}</h1>
-                        <p>{{ category.description }}</p>
-                        <div class="category-stats">
-                            <span><i class="fas fa-box"></i> {{ products.paginator.count }} محصول</span>
-                            {% if category.subcategories.exists %}
-                                <span><i class="fas fa-layer-group"></i> {{ category.subcategories.count }} زیردسته</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% if category.image %}
-                <div class="category-image">
-                    <img src="{{ category.image.url }}" alt="{{ category.name }}">
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </section>
-
-    <!-- Subcategories -->
-    {% if subcategories %}
-    <section class="subcategories">
-        <div class="container">
-            <h2>زیردسته‌های {{ category.name }}</h2>
-            <div class="subcategories-grid">
-                {% for subcategory in subcategories %}
-                <a href="{% url 'category_products' subcategory.name %}" class="subcategory-card">
-                    <div class="subcategory-icon">
-                        <i class="{{ subcategory.icon }}"></i>
-                    </div>
-                    <h3>{{ subcategory.name }}</h3>
-                    <p>{{ subcategory.product_count }} محصول</p>
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-    {% endif %}
-
-    <!-- Products Section -->
     <section class="products-page">
         <div class="container">
             <div class="products-layout">
@@ -88,7 +39,7 @@
                         <button class="clear-filters" onclick="clearAllFilters()">پاک کردن همه</button>
                     </div>
 
-                    <form method="GET" action="{% url 'category_products' category.name %}" id="filtersForm">
+                    <form method="GET" action="{% url 'wishlist' %}" id="filtersForm">
                         <!-- Search Filter -->
                         <div class="filter-group">
                             <h4>جستجو در {{ category.name }}</h4>
@@ -190,16 +141,13 @@
                         <button type="submit" class="apply-filters">اعمال فیلترها</button>
                     </form>
                 </aside>
-
-                <!-- Main Content -->
+                <!-- Products Main -->
                 <main class="products-main">
-                    <!-- Products Header -->
                     <div class="products-header">
                         <div class="products-info">
-                            <h2>محصولات {{ category.name }}</h2>
-                            <p>{{ products.count }}  محصول یافت شد </p>
+                            <h1>لیست علاقه‌مندی‌ها</h1>
+                            <p>{{ wishlist_products.count }} محصول در علاقه‌مندی‌ها</p>
                         </div>
-
                         <div class="products-controls">
                             <!-- View Toggle -->
                             <div class="view-toggle">
@@ -229,28 +177,21 @@
                             </button>
                         </div>
                     </div>
-
-                    <!-- Active Filters -->
                     {% if active_filters %}
-                    <div class="active-filters">
-                        <span>فیلترهای فعال:</span>
-                        {% for filter in active_filters %}
-                        <span class="filter-tag">
-                            {{ filter.name }}
-                            <button onclick="removeFilter('{{ filter.param }}', '{{ filter.value }}')">&times;</button>
-                        </span>
-                        {% endfor %}
-                    </div>
+                        <div class="active-filters">
+                            فیلترهای فعال:
+                            {% for filter in active_filters %}
+                                <span class="active-filter">{{ filter.name }} ×</span>
+                            {% endfor %}
+                        </div>
                     {% endif %}
-
-                    <!-- Products Grid -->
                     <div class="products-container" id="productsContainer">
-                        {% if products %}
+                        {% if wishlist_products %}
                         <div class="products-grid" id="productsGrid">
-                            {% for product in products %}
+                            {% for product in wishlist_products %}
                             <div class="product-card fade-in">
                                 <!-- نشان تخفیف -->
-                                {% if product.discount != 0 %}
+                                {% if product.discount != 0%}
                                     <div class="discount-badge">
                                         {{ product.discount }}% تخفیف
                                     </div>
@@ -274,6 +215,7 @@
                                             {{ product.category.name }}
                                         </a>
                                     </div>
+
                     <!-- Stock Status -->
                     <div class="stock-status">
                         {% if product.stock > 0 %}
@@ -288,6 +230,7 @@
                             </span>
                         {% endif %}
                     </div>
+
                                     <!-- قیمت با تخفیف -->
                                     <div class="product-pricing">
                                         {% if product.discount != 0 %}
@@ -295,11 +238,13 @@
                                                 <span class="current-price">{{ product.sale_price|intcomma }} تومان </span>
                                                 <span class="original-price">{{ product.price|intcomma }}</span>
                                             </div>
+{#                                            <div class="discount-amount">#}
+{#                                                صرفه‌جویی {{ product.discount_amount|price_format }} تومان#}
+{#                                            </div>#}
                                         {% else %}
                                             <div class="product-price">{{ product.price|intcomma }} تومان </div>
                                         {% endif %}
                                     </div>
-
 
                                     <div class="product-rating">
                                         <span class="stars">
@@ -324,13 +269,9 @@
                                             </button>
                                         </form>
 
-                                        <button class="wishlist-btn" onclick="toggleWishlist({{ product.id }}, event)">
-                                            {% if product in request.user.profile.wishlist.all %}
-                                                <i class="fas fa-heart" style="border-color: #e74c3c; color:#e74c3c "></i>
-                                            {% else %}
-                                                <i class="far fa-heart"></i>
-                                            {% endif %}
-                                        </button>
+                                        <button class="remove-from-wishlist" onclick="removeWishlist({{ product.id }}, event)">
+                                            <i class="fas fa-trash"></i>
+                                            </button>
 
                                         <a href="{% url 'detail' product.token %}" class="quick-view-btn">
                                             <i class="fas fa-eye"></i>
@@ -341,100 +282,60 @@
                             {% endfor %}
                         </div>
                         {% else %}
+                            {% if empty %}
+                            <div class="no-products">
+                                <i class="fas fa-heart-broken no-products-icon"></i>
+
+                                <h3>لیست علاقه‌مندی‌ها خالی است</h3>
+                                <p>محصولی به لیست علاقه‌مندی‌ها اضافه نشده است.</p>
+                                <a href = '{% url "products" %}' style="text-decoration: none; ">
+                                    <button class="clear-filters-btn">رفتن به لیست محصولات</button>
+                                </a>
+                            </div>
+                            {% else %}
                         <div class="no-products">
+                            <div class="no-products-icon">
+                            </div>
                             <div class="no-products-icon">
                                 <i class="fas fa-search"></i>
                             </div>
-                            <h3>محصولی در این دسته یافت نشد</h3>
-                            <p>متأسفانه محصولی در دسته {{ category.name }} با این مشخصات پیدا نکردیم.</p>
-                            <div class="no-products-actions">
-                                <button onclick="clearAllFilters()" class="clear-filters-btn">پاک کردن فیلترها</button>
-                                <a href="{% url 'products' %}" class="browse-all-btn">مشاهده همه محصولات</a>
-                            </div>
+                            <h3>محصولی یافت نشد</h3>
+                            <p>متأسفانه محصولی با این مشخصات در پیدا نکردیم.</p>
+                            <button onclick="clearAllFilters()" class="clear-filters-btn">پاک کردن فیلترها</button>
                         </div>
+                                {% endif %}
                         {% endif %}
                     </div>
-
-                    <!-- Pagination -->
-                    {% if products.has_other_pages %}
-                    <div class="pagination-container">
-                        <nav class="pagination">
-                            {% if products.has_previous %}
-                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ products.previous_page_number }}" class="page-btn">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                            {% endif %}
-
-                            {% for num in products.paginator.page_range %}
-                                {% if products.number == num %}
-                                    <span class="page-btn active">{{ num }}</span>
-                                {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
-                                    <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}" class="page-btn">{{ num }}</a>
+                    {% if wishlist_products.has_other_pages %}
+                        <div class="pagination-container">
+                            <nav class="pagination">
+                                {% if wishlist_products.has_previous %}
+                                    <a href="?page=1" class="page-btn">&laquo;</a>
                                 {% endif %}
-                            {% endfor %}
-
-                            {% if products.has_next %}
-                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ products.next_page_number }}" class="page-btn">
-                                    <i class="fas fa-chevron-left"></i>
-                                </a>
-                            {% endif %}
-                        </nav>
-
-                        <div class="pagination-info">
-                            صفحه {{ products.number }} از {{ products.paginator.num_pages }}
-                            ({{ products.paginator.count }} محصول)
+                                {% for num in wishlist_products.paginator.page_range %}
+                                    {% if wishlist_products.number == num %}
+                                        <span class="page-btn active">{{ num }}</span>
+                                    {% elif num > wishlist_products.number|add:'-3' and num < wishlist_products.number|add:'3' %}
+                                        <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if wishlist_products.has_next %}
+                                    <a href="?page={{ wishlist_products.paginator.num_pages }}" class="page-btn">&raquo;</a>
+                                {% endif %}
+                            </nav>
+                            <p class="pagination-info">
+                                صفحه {{ wishlist_products.number }} از {{ wishlist_products.paginator.num_pages }}
+                                ({{ wishlist_products.paginator.count }} محصول)
+                            </p>
                         </div>
-                    </div>
                     {% endif %}
                 </main>
             </div>
         </div>
     </section>
-
-    <!-- Related Categories -->
-    {% if related_categories %}
-    <section class="related-categories">
-        <div class="container">
-            <h2>دسته‌های مرتبط</h2>
-            <div class="related-categories-grid">
-                {% for related_category in related_categories %}
-                <a href="{% url 'category_products' related_category.name %}" class="related-category-card">
-                    <div class="related-category-icon">
-                        <i class="{{ related_category.icon }}"></i>
-                    </div>
-                    <h3>{{ related_category.name }}</h3>
-                    <p>{{ related_category.product_count }} محصول</p>
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-    {% endif %}
-
-    <!-- Mobile Filters Overlay -->
-    <div class="mobile-filters-overlay" id="mobileFiltersOverlay">
-        <div class="mobile-filters-content">
-            <div class="mobile-filters-header">
-                <h3>فیلتر محصولات</h3>
-                <button onclick="toggleMobileFilters()">&times;</button>
-            </div>
-            <!-- Same filters as sidebar will be duplicated here via JavaScript -->
-        </div>
-    </div>
-    {% include 'partials/footer.html' %}
-    <!-- Messages from Django -->
-    {% if messages %}
-        {% for message in messages %}
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    showNotification('{{ message }}', '{{ message.tags }}');
-                });
-            </script>
-        {% endfor %}
-    {% endif %}
-
-    <script src="{% static 'js/script.js' %}"></script>
-    <script src="{% static 'js/products.js' %}"></script>
-    <script src="{% static 'js/category.js' %}"></script>
+{% include 'partials/footer.html' %}
+    <script src="{% static 'js/wishlist.js' %}"></script>
+    <script src="{% static 'js/products.js' %}" ></script>
+    <script src="{% static 'js/script.js' %}" ></script>
 </body>
 </html>

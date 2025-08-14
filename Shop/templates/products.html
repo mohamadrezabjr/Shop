@@ -178,7 +178,7 @@
                                     همه محصولات
                                 {% endif %}
                             </h1>
-                            <p>{{ products.paginator.count }} محصول یافت شد</p>
+                            <p>{{ products.count }} محصول یافت شد</p>
                         </div>
 
                         <div class="products-controls">
@@ -260,12 +260,12 @@
                     <div class="stock-status">
                         {% if product.stock > 0 %}
                             <span class="in-stock">
-                                <i class="fas fa-check-circle"></i>
+                                <i class="fas fa-check-circle" style="color: #00b348"></i>
                                 موجود در انبار ({{ product.stock }} عدد)
                             </span>
                         {% else %}
-                            <span class="out-of-stock">
-                                <i class="fas fa-times-circle"></i>
+                            <span class="out-of-stock" style="color: red">
+                                <i class="fas fa-times-circle" style="color: red"></i>
                                 ناموجود
                             </span>
                         {% endif %}
@@ -384,6 +384,7 @@
         </div>
     </div>
 
+    {% include 'partials/footer.html' %}
     <!-- Messages from Django -->
     {% if messages %}
         {% for message in messages %}
@@ -394,6 +395,7 @@
             </script>
         {% endfor %}
     {% endif %}
+
 
     <script src="{% static 'js/script.js' %}"></script>
     <script src="{% static 'js/products.js' %}"></script>
