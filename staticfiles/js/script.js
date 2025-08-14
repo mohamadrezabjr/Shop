@@ -146,20 +146,44 @@ function initializeAnimations() {
 }
 
 // Show notification
-function showNotification(message) {
+function showNotification(message, type = "info") {
+  // اگر تابع اصلی showNotification موجود است، از آن استفاده کن
+
+
+  // در غیر این صورت notification ساده ایجاد کن
   const notification = document.createElement("div")
+
+  let backgroundColor = "#2c5aa0"
+  switch (type) {
+    case "success":
+      backgroundColor = "#28a745"
+      break
+    case "error":
+      backgroundColor = "#dc3545"
+      break
+    case "warning":
+      backgroundColor = "#ffc107"
+      break
+    case "info":
+      backgroundColor = "#17a2b8"
+      break
+  }
+
   notification.style.cssText = `
-        position: fixed;
-        top: 100px;
-        right: 20px;
-        background: #2c5aa0;
-        color: white;
-        padding: 1rem 2rem;
-        border-radius: 8px;
-        z-index: 3000;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
-    `
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: ${backgroundColor};
+    color: ${type === "warning" ? "#000" : "#fff"};
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    z-index: 3000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-width: 300px;
+    word-wrap: break-word;
+  `
   notification.textContent = message
 
   document.body.appendChild(notification)
@@ -171,7 +195,9 @@ function showNotification(message) {
   setTimeout(() => {
     notification.style.transform = "translateX(100%)"
     setTimeout(() => {
-      document.body.removeChild(notification)
+      if (document.body.contains(notification)) {
+        document.body.removeChild(notification)
+      }
     }, 300)
   }, 3000)
 }

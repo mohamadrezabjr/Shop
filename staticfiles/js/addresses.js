@@ -46,3 +46,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+document.addEventListener("DOMContentLoaded", () => {
+    const editButtons = document.querySelectorAll("#edit-address-btn");
+    const editModal = document.querySelector("#edit-address-modal");
+    const editForm = document.getElementById("edit-address-form");
+
+
+    // فیلدهای فرم ویرایش
+    const cityInput = editModal.querySelector("input[name='city']");
+    const addressInput = editModal.querySelector("textarea[name='address']");
+    const unitInput = editModal.querySelector("input[name='unit']");
+    const postalInput = editModal.querySelector("input[name='postal_code']");
+    const form = editModal.querySelector('form')
+
+    // بستن مدال‌ها
+    document.querySelectorAll(".modal .close").forEach(closeBtn => {
+        closeBtn.addEventListener("click", () => {
+            closeBtn.closest(".modal").style.display = "none";
+        });
+    });
+
+    // باز کردن مدال و پر کردن فیلدها
+    editButtons.forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            event.preventDefault();
+
+            editForm.action = `/profile/addresses/edit/${btn.dataset.id}/`;
+            cityInput.value = btn.dataset.city;
+            addressInput.value = btn.dataset.address;
+            unitInput.value = btn.dataset.unit || "";
+            postalInput.value = btn.dataset.postal;
+
+            editModal.style.display = 'block';
+            editModal.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+});
+
+

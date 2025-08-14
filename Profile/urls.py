@@ -10,5 +10,8 @@ urlpatterns = [
 
     path('order/<str:token>/', views.order_detail, name='order_detail'),
     path('order_cancel/<str:token>/', views.order_cancel, name='order_cancel'),
+
     path('addresses/', views.addresses, name='addresses'),
+    path('addresses/edit/<int:address_id>/', views.address_edit, name='address_edit'),
+    path('addresses/remove/<int:address_id>/', views.address_remove, name='address_remove'),
 ]

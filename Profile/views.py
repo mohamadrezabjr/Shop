@@ -185,9 +185,38 @@ def addresses(request):
             return redirect('addresses')
 
     n = cart_num(request)
-    addresses = request.user.profile.address.all()
+    addresses = request.user.profile.address.all().filter(save_address=True)
     context = {'addresses': addresses, 'n':n}
     return render(request, 'addresses.html', context=context)
 
 
+def address_edit(request, address_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if request.method == 'POST':
+        address_text = request.POST.get('address')
+        unit = request.POST.get('unit') or 0
+        city = request.POST.get('city')
+        postal_code = request.POST.get('postal_code')
+        address = Address.objects.get(id=address_id)
 
+        if address.user != request.user:
+            return redirect('addresses')
+
+        address.address = address_text
+        address.unit = unit
+        address.city = city
+        address.postal_code = postal_code
+        address.save()
+
+    return redirect('addresses')
+def address_remove(request, address_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if request.method == 'POST':
+        address = Address.objects.get(id=address_id)
+        if address.user != request.user:
+            return redirect('addresses')
+        address.save_address = False
+        address.save()
+    return redirect('addresses')

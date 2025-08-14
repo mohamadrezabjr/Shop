@@ -35,8 +35,18 @@
                                 <small class="postal-code">کد پستی: {{ address.postal_code }}</small>
                             </div>
                             <div class="address-actions">
-                                <a href="" class="select-btn"><i class="fas fa-edit"></i> ویرایش</a>
-                                <form method="POST" action="" class="delete-form">
+                                <button id="edit-address-btn"
+                                   class="select-btn edit-btn"
+                                   data-city="{{ address.city }}"
+                                   data-address="{{ address.address }}"
+                                   data-unit="{{ address.unit }}"
+                                   data-postal="{{ address.postal_code }}"
+                                   data-id="{{ address.id }}"
+                                >
+                                    <i class="fas fa-edit"></i> ویرایش
+                                </button>
+                                <form method="POST" action="{% url 'address_remove' address.id %}" class="delete-form"
+                                onclick="return confirm('آیا از حذف این آدرس از لیست آدرس‌ها اطمینان دارید؟')">
                                     {% csrf_token %}
                                     <button type="submit" class="remove-item"><i class="fas fa-trash"></i> حذف</button>
                                 </form>
@@ -98,6 +108,54 @@
                     </div>
                 </div>
             </div>
+            <!-- Edit Address Modal -->
+            <div class="modal" id="edit-address-modal">
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>ویرایش آدرس</h3>
+                        <span class="close">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <form class="auth-form" id='edit-address-form' method="POST" >
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="city"> شهر  <i class="fas fa-city" style="color: #2c5aa0"> </i></label>
+                                <div class="input-wrapper">
+
+                                    <input type="text" id="city" name="city" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="address"> آدرس  <i class="fas fa-map-marker-alt" style="color: #2c5aa0"></i></label>
+                                <div class="input-wrapper">
+
+                                    <textarea id="address" name="address" required></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="unit"> واحد (اختیاری)<i class="fas fa-building" style="color: #2c5aa0"></i></label>
+                                <div class="input-wrapper">
+
+
+                                    <input type="text" id="unit" name="unit">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="postal_code"> کد پستی  <i class="fas fa-mail-bulk" style="color: #2c5aa0"></i></label>
+                                <div class="input-wrapper">
+
+                                        <input type="text" id="postal_code" name="postal_code" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="auth-btn">
+                                <i class="fas fa-save"></i> ذخیره آدرس
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 {% include 'partials/footer.html' %}
