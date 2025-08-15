@@ -506,7 +506,8 @@
 
 .review-item {
   padding: 1.5rem;
-  border: 1px solid #eee;
+  background-color: #ffffff;
+  border: 1px solid #a19d9d;
   border-radius: 10px;
   margin-bottom: 1rem;
 }
@@ -533,7 +534,7 @@
 }
 
 .review-content p {
-  color: #666;
+  color: #000000;
   line-height: 1.6;
 }
 

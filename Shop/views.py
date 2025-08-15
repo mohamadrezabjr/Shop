@@ -383,6 +383,25 @@ def checkout(request):
     context = {'user_addresses':user_addresses, 'total': total, 'cart_items': cart_items, 'subtotal': subtotal, 'discount': discount}
     return render(request, 'checkout.html', context)
 
+def make_review(request, token):
+    referer = request.META.get('HTTP_REFERER')
+    if request.method == 'POST':
+        star = int(request.POST.get('star'))
+        comment = request.POST.get('comment')
+        user = request.user
+        product = Product.objects.get(token=token)
+        try:
+            new_review = ProductReview.objects.create(user=user, product=product, star=star, comment=comment)
+        except :
+            return redirect(referer)
+        product_reviews = product.reviews.all()
+        if product_reviews:
+
+            rating = (star + (product.rating * (product_reviews.count()-1)))/product_reviews.count()
+            product.rating = rating
+            product.save()
+
+    return redirect(referer)
 
 def search(request):
     n = cart_num(request)

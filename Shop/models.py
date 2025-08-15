@@ -24,6 +24,8 @@ class Image(models.Model):
         if self.product.first():
             return f'{self.product.first().name or "product"}`s image : {self.image} '
         return f'product`s image : {self.image} '
+
+
 class Product(models.Model):
     name = models.CharField(max_length=100)
     price = models.IntegerField()
@@ -37,6 +39,7 @@ class Product(models.Model):
     extra_details = models.TextField(null=True, blank=True, default=None)
     discount = models.IntegerField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
+    rating = models.FloatField(default=0)
     token= models.CharField( blank= True, max_length=10,null= True  )
 
     def save(self, *args, **kwargs):
@@ -49,6 +52,24 @@ class Product(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.name, self.category)
+
+
+class ProductReview(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment = models.TextField()
+    star_choices = [
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4),
+        (5, 5)
+    ]
+    star = models.IntegerField(choices=star_choices)
+
+    def __str__(self):
+        return f'{self.user} - {self.star} Stars'
+
 
 class Cart(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)

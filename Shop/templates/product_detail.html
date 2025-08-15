@@ -87,7 +87,7 @@
                                     {% if forloop.counter <= product.rating %}★{% else %}☆{% endif %}
                                 {% endfor %}
                             </span>
-                            <span class="rating-text">({{ product.rating }} از 5)</span>
+                            <span class="rating-text">({{ product.rating|floatformat:1 }} از 5)</span>
                         </div>
                         <div class="reviews-count">
                             <a href="#reviews">{{ product.reviews_count|default:0 }} نظر</a>
@@ -206,7 +206,7 @@
             <div class="tabs-header">
                 <button class="tab-btn active" data-tab="description">توضیحات</button>
                 <button class="tab-btn" data-tab="specifications">مشخصات</button>
-                <button class="tab-btn" data-tab="reviews">نظرات ({{ product.reviews_count|default:0 }})</button>
+                <button class="tab-btn" data-tab="reviews">نظرات ({{ product.reviews.count|default:0 }})</button>
                 <button class="tab-btn" data-tab="shipping">ارسال و بازگشت</button>
             </div>
 
@@ -247,20 +247,20 @@
                             <h3>نظرات کاربران</h3>
                             <div class="rating-breakdown">
                                 <div class="overall-rating">
-                                    <span class="rating-number">{{ product.rating }}</span>
+                                    <span class="rating-number">{{ product.rating|floatformat:1 }}</span>
                                     <div class="rating-stars">
                                         {% for i in "12345" %}
                                             {% if forloop.counter <= product.rating %}★{% else %}☆{% endif %}
                                         {% endfor %}
                                     </div>
-                                    <span class="total-reviews">بر اساس {{ product.reviews_count|default:0 }} نظر</span>
+                                    <span class="total-reviews">بر اساس {{ product.reviews.count|default:0 }} نظر</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Reviews List -->
                         <div class="reviews-list">
-                            {% for review in product.reviews.all %}
+                            {% for review in product.reviews.all reversed %}
                             <div class="review-item">
                                 <div class="review-header">
                                     <div class="reviewer-info">
@@ -269,7 +269,7 @@
                                     </div>
                                     <div class="review-rating">
                                         {% for i in "12345" %}
-                                            {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                                            {% if forloop.counter <= review.star %}★{% else %}☆{% endif %}
                                         {% endfor %}
                                     </div>
                                 </div>
@@ -286,20 +286,20 @@
                         {% if user.is_authenticated %}
                         <div class="add-review">
                             <h4>نظر خود را بنویسید</h4>
-                            <form method="POST" action="" class="review-form">
+                            <form method="POST" action="make_review/" class="review-form">
                                 {% csrf_token %}
                                 <div class="rating-input">
                                     <label>امتیاز شما:</label>
                                     <div class="star-rating">
-                                        <input type="radio" name="rating" value="5" id="star5">
+                                        <input type="radio" name="star" value="5" id="star5">
                                         <label for="star5">★</label>
-                                        <input type="radio" name="rating" value="4" id="star4">
+                                        <input type="radio" name="star" value="4" id="star4">
                                         <label for="star4">★</label>
-                                        <input type="radio" name="rating" value="3" id="star3">
+                                        <input type="radio" name="star" value="3" id="star3">
                                         <label for="star3">★</label>
-                                        <input type="radio" name="rating" value="2" id="star2">
+                                        <input type="radio" name="star" value="2" id="star2">
                                         <label for="star2">★</label>
-                                        <input type="radio" name="rating" value="1" id="star1">
+                                        <input type="radio" name="star" value="1" id="star1">
                                         <label for="star1">★</label>
                                     </div>
                                 </div>
