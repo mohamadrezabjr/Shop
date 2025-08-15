@@ -88,20 +88,18 @@ def index(request):
 @ratelimit(key='ip', rate='10/s', block=True)
 def products(request):
     n = cart_num(request)
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
+    min_price = request.GET.get('min_price') or 0
+    max_price = request.GET.get('max_price') or 9999999999999999
     has_discount = request.GET.get('has_discount')
     in_stock = request.GET.get('in_stock')
     search = request.GET.get('search')
     sort = request.GET.get('sort')
-
-    if not min_price :
-        min_price = 0
-    if not max_price :
-        max_price = 999999999999999
+    min_rating = request.GET.get('min_rating')
 
     products = Product.objects.filter(Q(price__gte=min_price, price__lte=max_price)| Q(sale_price__gte=min_price, sale_price__lte=max_price))
 
+    if min_rating:
+        products = products.filter(rating__gte=min_rating)
     if has_discount :
         products =products.filter(discount__gt= 0)
     if search :
@@ -118,6 +116,8 @@ def products(request):
         products = products.order_by('-date')
     elif sort == "oldest" :
         products = products.order_by('date')
+    elif sort == "rating" :
+        products = products.order_by('-rating')
     return render(request, 'products.html', {'products': products, 'n': n})
 
 @ratelimit(key='ip', rate='10/s', block=True)
@@ -135,19 +135,18 @@ def category_products(request, name):
 
     products = Product.objects.filter(category=category)
 
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
+    min_price = request.GET.get('min_price') or 0
+    max_price = request.GET.get('max_price') or 999999999999999
     has_discount = request.GET.get('has_discount')
     search = request.GET.get('search')
     sort = request.GET.get('sort')
     in_stock = request.GET.get('in_stock')
+    min_rating = request.GET.get('min_rating')
 
-    if not min_price :
-        min_price = 0
-    if not max_price :
-        max_price = 9999999999999999
+
     products = products.filter(Q(price__gte=min_price, price__lte=max_price) | Q(sale_price__gte=min_price, sale_price__lte=max_price))
-
+    if min_rating :
+        products = products.filter(rating__gte = min_rating)
     if search :
         products = products.filter(name__icontains=search)
 
@@ -166,6 +165,9 @@ def category_products(request, name):
         products = products.order_by('-date')
     elif sort == "oldest" :
         products = products.order_by('date')
+    elif sort == "rating" :
+        products = products.order_by('-rating')
+
     n = cart_num(request)
     context = {'products': products, 'category': category, 'n': n}
     return render(request, 'category_products.html', context)

@@ -292,7 +292,7 @@
                                                 {% if forloop.counter <= product.rating %}★{% else %}☆{% endif %}
                                             {% endfor %}
                                         </span>
-                                        <span class="rating-text">({{ product.rating }})</span>
+                                        <span class="rating-text">({{ product.rating|floatformat:1 }})</span>
                                     </div>
 
                                     <div class="product-actions">

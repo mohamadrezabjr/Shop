@@ -78,21 +78,18 @@ def wishlist(request):
         empty = False
     else:
         empty = True
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
+    min_price = request.GET.get('min_price') or 0
+    max_price = request.GET.get('max_price') or 99999999999999
     has_discount = request.GET.get('has_discount')
     in_stock = request.GET.get('in_stock')
     search = request.GET.get('search')
     sort = request.GET.get('sort')
-
-    if not min_price:
-        min_price = 0
-    if not max_price:
-        max_price = 999999999999999
+    min_rating = request.GET.get('min_rating')
 
     wishlist_products = wishlist_products.filter(
         Q(price__gte=min_price, price__lte=max_price) | Q(sale_price__gte=min_price, sale_price__lte=max_price))
-
+    if min_rating :
+        wishlist_products = wishlist_products.filter(rating__gte = min_rating)
     if has_discount:
         wishlist_products = wishlist_products.filter(discount__gt=0)
     if search:
@@ -109,8 +106,8 @@ def wishlist(request):
         wishlist_products = wishlist_products.order_by('-date')
     elif sort == "oldest":
         wishlist_products = wishlist_products.order_by('date')
-
-
+    elif sort == "rating":
+        wishlist_products = wishlist_products.order_by('-rating')
 
     context = {'wishlist_products': wishlist_products, 'empty': empty,'n':n}
     return render(request, 'wishlist.html', context)

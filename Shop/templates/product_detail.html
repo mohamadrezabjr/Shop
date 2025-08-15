@@ -382,11 +382,11 @@
                         <div class="product-pricing">
                             {% if related_product.discount != 0 %}
                                 <div class="price-with-discount">
-                                    <span class="current-price">{{ related_product.sale_price|intcomma }}</span>
+                                    <span class="current-price">{{ related_product.sale_price|intcomma }} تومان </span>
                                     <span class="original-price">{{ related_product.price|intcomma }}</span>
                                 </div>
                             {% else %}
-                                <div class="product-price">{{ related_product.price|intcomma }}</div>
+                                <div class="product-price">{{ related_product.price|intcomma }} تومان </div>
                             {% endif %}
                         </div>
                         
