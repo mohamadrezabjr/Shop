@@ -28,8 +28,8 @@ class Image(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
-    price = models.IntegerField()
-    sale_price = models.IntegerField(auto_created=True, null=True, blank=True)
+    price = models.BigIntegerField()
+    sale_price = models.BigIntegerField(auto_created=True, null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True, null = True, blank = True)
     stock = models.IntegerField(default=5)
     condition = models.BooleanField(default=True)
@@ -75,7 +75,7 @@ class Cart(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     num = models.IntegerField(default=1)
-    total_price = models.IntegerField(null=True, blank=True)
+    total_price = models.BigIntegerField(null=True, blank=True)
     ordered = models.BooleanField(default=False)
     def save(self, *args, **kwargs):
         self.total_price = self.product.sale_price * self.num
@@ -95,7 +95,7 @@ class Order(models.Model):
     products = models.ManyToManyField(Cart)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.ForeignKey('Profile.Address', on_delete=models.CASCADE)
-    price = models.IntegerField()
+    price = models.BigIntegerField()
     date = models.DateTimeField(default=datetime.now)
     phone_number = models.CharField(max_length=11, null=True, blank=True)
     notes = models.TextField(null=True, blank=True)

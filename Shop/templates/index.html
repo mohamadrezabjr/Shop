@@ -106,7 +106,7 @@
                                     {% if forloop.counter <= product.rating %}★{% else %}☆{% endif %}
                                 {% endfor %}
                             </span>
-                            <span>({{ product.rating }})</span>
+                            <span>({{ product.rating|floatformat:1 }})</span>
                         </div>
 
                         <form method="POST" action="{% url 'add_to_cart' product.token %}">
