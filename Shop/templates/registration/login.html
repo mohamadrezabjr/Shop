@@ -38,8 +38,8 @@
                     </div>
                 {% url 'login' as login_url %}
                     <!-- Login Form -->
-                    {% if request.META.HTTP_REFERER|endswith_path:login_url %}
-                    <form method="POST" class="auth-form" id="loginForm" action="{% url 'login' %}?next={% url 'index' %}">
+                    {% if 'next' in request.GET %}
+                    <form method="POST" class="auth-form" id="loginForm" action="{% url 'login' %}?next={{request.GET.next}}">
                     {% else %}
                     <form method="POST" class="auth-form" id="loginForm" action="{% url 'login' %}?next={{ request.META.HTTP_REFERER }}">
                     {% endif %}
