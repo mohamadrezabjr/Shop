@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'cloudinary',
     'django.contrib.humanize',
+    'dbbackup',
 
     'Shop',
     'bootstrap5',

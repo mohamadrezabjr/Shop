@@ -324,8 +324,9 @@ def cart(request):
         n = cart_num(request)
         subtotal = cart_totals['subtotal']
         total = cart_totals['total']
+        total_discount = cart_totals['subtotal'] - cart_totals['total']
 
-        context = {'cart': cart, 'total_price': total, 'n': n, 'subtotal': subtotal, }
+        context = {'cart': cart, 'total_price': total, 'n': n, 'subtotal': subtotal, 'total_discount': total_discount}
         return render(request, 'cart.html', context)
     return redirect('login')
 
@@ -342,6 +343,7 @@ def checkout(request):
 
     if request.method == 'POST':
         selected_address_id = request.POST['selected_address_id']
+
         if selected_address_id:
             order_address = Address.objects.get(id=selected_address_id)
         else:
@@ -359,11 +361,11 @@ def checkout(request):
                 profile.address.add(order_address)
                 profile.save()
 
-
+        shipping_method = request.POST.get('shipping_method')
         notes = request.POST.get('order_notes') or " "
         phone_number = request.POST.get('phone')
 
-        order = Order.objects.create(user=request.user, price=total, address=order_address, notes=notes, phone_number=phone_number)
+        order = Order.objects.create(user=request.user, price=total, address=order_address, notes=notes, phone_number=phone_number, shipping = shipping_method)
         order.products.set(cart_items)
         order.save()
 
@@ -381,12 +383,13 @@ def checkout(request):
             cart_item.ordered = True
             cart_item.save()
         return redirect('index')
-
-    context = {'user_addresses':user_addresses, 'total': total, 'cart_items': cart_items, 'subtotal': subtotal, 'discount': discount}
+    n = cart_num(request)
+    context = {'user_addresses':user_addresses, 'total': total, 'cart_items': cart_items, 'subtotal': subtotal, 'discount': discount,'n' : n}
     return render(request, 'checkout.html', context)
 
 def make_review(request, token):
     referer = request.META.get('HTTP_REFERER')
+
     if request.method == 'POST':
         star = int(request.POST.get('star'))
         comment = request.POST.get('comment')

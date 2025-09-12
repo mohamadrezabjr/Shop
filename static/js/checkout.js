@@ -168,9 +168,9 @@ function updateShippingCost(method) {
 
   switch (method) {
     case "standard":
-      const subtotalText = document.getElementById("subtotal").textContent
+      const subtotalText = document.getElementById("total").textContent
       const subtotalValue = Number.parseInt(subtotalText.replace(/[^\d]/g, ""))
-      if (subtotalValue >= 500000) {
+      if (subtotalValue >= 5000000) {
         shippingCost = 0
         shippingText = "رایگان"
       } else {
@@ -221,7 +221,7 @@ function updatePaymentFee(method) {
 
 // Update Final Total
 function updateFinalTotal() {
-  const subtotalText = document.getElementById("subtotal").textContent
+  const subtotalText = document.getElementById("total").textContent
   const shippingText = document.getElementById("shippingCost").textContent
   const discountText = document.getElementById("discountAmount").textContent
   const finalTotalElement = document.getElementById("finalTotal")
@@ -233,9 +233,9 @@ function updateFinalTotal() {
   // Add COD fee if selected
   const codFeeRow = document.getElementById("codFeeRow")
   let codFee = 0
-  if (codFeeRow.style.display !== "none") {
-    codFee = 10000
-  }
+  // if (codFeeRow.style.display !== "none") {
+  //   codFee = 10000
+  // }
 
   const finalTotal = subtotal + shipping + codFee - discount
 

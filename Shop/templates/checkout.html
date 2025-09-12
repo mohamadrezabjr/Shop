@@ -47,7 +47,7 @@
                     </div>
                     <a href="{% url 'cart' %}" class="cart-icon">
                         <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count">{{ cart_count|default:0 }}</span>
+                        <span class="cart-count">{{ n|default:0 }}</span>
                     </a>
                     <button class="menu-toggle" id="menuToggle">
                         <i class="fas fa-bars"></i>
@@ -56,6 +56,8 @@
             </div>
         </div>
     </header>
+    <br>
+    <br>
 
     <!-- Breadcrumb -->
     <section class="breadcrumb">
@@ -311,7 +313,7 @@
                                             <div class="shipping-title">
                                                 <span>ارسال عادی</span>
                                                 <span class="shipping-price">
-                                                    {% if subtotal >= 500000 %}
+                                                    {% if total >= 5000000 %}
                                                         رایگان
                                                     {% else %}
                                                         {{ 30000|intcomma }} تومان
@@ -389,28 +391,28 @@
                                                 <span>پرداخت در محل</span>
                                             </div>
                                             <div class="payment-desc">پرداخت هنگام تحویل کالا</div>
-                                            <div class="payment-note">
-                                                <i class="fas fa-info-circle"></i>
-                                                هزینه اضافی: {{ 10000|intcomma }} تومان
-                                            </div>
+{#                                            <div class="payment-note">#}
+{#                                                <i class="fas fa-info-circle"></i>#}
+{#                                                هزینه اضافی: {{ 10000|intcomma }} تومان#}
+{#                                            </div>#}
                                         </div>
                                     </label>
                                 </div>
-                                <div class="payment-option">
-                                    <label class="radio-wrapper">
-                                        <input type="radio" name="payment_method" value="wallet">
-                                        <span class="radio-mark"></span>
-                                        <div class="payment-info">
-                                            <div class="payment-title">
-                                                <i class="fas fa-wallet"></i>
-                                                <span>کیف پول</span>
-                                            </div>
-                                            <div class="payment-desc">
-                                                موجودی: {{ user_wallet_balance|default:0|intcomma }} تومان
-                                            </div>
-                                        </div>
-                                    </label>
-                                </div>
+{#                                <div class="payment-option">#}
+{#                                    <label class="radio-wrapper">#}
+{#                                        <input type="radio" name="payment_method" value="wallet">#}
+{#                                        <span class="radio-mark"></span>#}
+{#                                        <div class="payment-info">#}
+{#                                            <div class="payment-title">#}
+{#                                                <i class="fas fa-wallet"></i>#}
+{#                                                <span>کیف پول</span>#}
+{#                                            </div>#}
+{#                                            <div class="payment-desc">#}
+{#                                                موجودی: {{ user_wallet_balance|default:0|intcomma }} تومان#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                    </label>#}
+{#                                </div>#}
                             </div>
                         </div>
 
@@ -517,16 +519,22 @@
                             <div class="total-row">
                                 <span>هزینه ارسال:</span>
                                 <span id="shippingCost">
-                                    {% if subtotal >= 500000 %}
+                                    {% if total >= 5000000 %}
                                         رایگان
                                     {% else %}
                                         {{ 30000|intcomma }} تومان
                                     {% endif %}
                                 </span>
                             </div>
+                        <div class="total-row">
+                                <span>قیمت کالا ها بعد تخفیف :</span>
+                                <span id="total">
+                                {{total|intcomma}} تومان
+                                </span>
+                            </div>
                             <div class="total-row cod-fee" id="codFeeRow" style="display: none;">
-                                <span>هزینه پرداخت در محل:</span>
-                                <span>{{ 10000|intcomma }} تومان</span>
+{#                                <span>هزینه پرداخت در محل:</span>#}
+{#                                <span>{{ 10000|intcomma }} تومان</span>#}
                             </div>
                             <div class="total-divider"></div>
                             <div class="total-row final-total">

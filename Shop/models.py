@@ -91,6 +91,12 @@ class Order(models.Model):
         ('cancelled', 'لغو شده'),
         ('completed', 'سفارش کامل شده'),
     )
+
+    SHIPPING_CHOICES = (
+        ('express',"ارسال فوری"),
+        ('standard',"ارسال عادی"),
+        ('pickup', 'تحویل حضوری')
+    )
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='pending')
     products = models.ManyToManyField(Cart)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -100,8 +106,16 @@ class Order(models.Model):
     phone_number = models.CharField(max_length=11, null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     token= models.CharField( blank= True,max_length=10,unique =True)
+    shipping = models.CharField(max_length=11, null=True, blank=True, choices=SHIPPING_CHOICES)
 
     def save(self, *args, **kwargs):
+        if self.price < 5000000:
+            if self.shipping == 'express':
+                self.price += 50000
+            elif self.shipping == 'standard':
+                self.price += 30000
+
+
         if not self.token:
             self.token = code_generator('O' , 7)
         super().save(*args, **kwargs)

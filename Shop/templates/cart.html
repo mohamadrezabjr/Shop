@@ -222,18 +222,22 @@
                             {% if total_discount > 0 %}
                             <div class="summary-row discount">
                                 <span>تخفیف:</span>
-                                <span>-{{ total_discount|intcomma }} تومان</span>
+                                <span>{{ total_discount|intcomma }} - تومان</span>
                             </div>
                             {% endif %}
                             <div class="summary-row">
                                 <span>هزینه ارسال:</span>
-                                {% if subtotal >= 500000 %}
+                                {% if subtotal >= 50000000 %}
                                     <span class="free-shipping">رایگان</span>
                                 {% else %}
-                                    <span>{{ shipping_cost|intcomma }} تومان</span>
+                                    <span>بستگی به روش ارسال</span>
                                 {% endif %}
+
                             </div>
+
                             <div class="summary-divider"></div>
+
+
                             <div class="summary-row total">
                                 <span>مبلغ قابل پرداخت:</span>
                                 <span>{{ total_price|intcomma }} تومان</span>
@@ -268,8 +272,8 @@
                                 <i class="fas fa-truck"></i>
                                 <div>
                                     <h4>ارسال رایگان</h4>
-                                    <p>برای خریدهای بالای {{ 500000|intcomma }} تومان</p>
-                                    {% if subtotal < 500000 %}
+                                    <p>برای خریدهای بالای {{ 5000000|intcomma }} تومان</p>
+                                    {% if subtotal < 5000000 %}
                                     <div class="free-shipping-progress">
                                         <div class="progress-bar">
                                             <div class="progress-fill" style="width: {{ subtotal }}%"></div>
@@ -329,7 +333,7 @@
                         شروع خرید
                     </a>
                     {% if user.is_authenticated %}
-                    <a href="" class="view-wishlist">
+                    <a href="{% url 'wishlist' %}" class="view-wishlist">
                         <i class="fas fa-heart"></i>
                         مشاهده علاقه‌مندی‌ها
                     </a>

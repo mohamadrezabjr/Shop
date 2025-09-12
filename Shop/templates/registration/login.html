@@ -36,10 +36,15 @@
                         <h1>ورود به حساب کاربری</h1>
                         <p>به فروشگاه آنلاین خوش آمدید</p>
                     </div>
-                {% url 'login' as login_url %}
                     <!-- Login Form -->
                     {% if 'next' in request.GET %}
-                    <form method="POST" class="auth-form" id="loginForm" action="{% url 'login' %}?next={{request.GET.next}}">
+
+                     {% if request.GET.next|endswith_path:"/password-reset-complete/" %}
+                         <form method="POST" class="auth-form" id="loginForm" action="{% url 'login' %}">
+                    {% else %}
+                         <form method="POST" class="auth-form" id="loginForm" action="{% url 'login' %}?next={{request.GET.next}}">
+                     {% endif %}
+
                     {% else %}
                     <form method="POST" class="auth-form" id="loginForm" action="{% url 'login' %}?next={{ request.META.HTTP_REFERER }}">
                     {% endif %}
