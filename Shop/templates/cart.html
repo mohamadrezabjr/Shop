@@ -245,26 +245,26 @@
                         </div>
 
                         <!-- Coupon Code -->
-                        <div class="coupon-section">
-                            <h4>کد تخفیف</h4>
-                            <form class="coupon-form" onsubmit="applyCoupon(event)">
-                                <div class="coupon-input">
-                                    <input type="text" name="coupon_code" placeholder="کد تخفیف را وارد کنید" id="couponCode">
-                                    <button type="submit">اعمال</button>
-                                </div>
-                            </form>
-                            {% if applied_coupon %}
-                            <div class="applied-coupon">
-                                <span class="coupon-info">
-                                    <i class="fas fa-check-circle"></i>
-                                    کد تخفیف "{{ applied_coupon.code }}" اعمال شد
-                                </span>
-                                <button class="remove-coupon" onclick="removeCoupon()">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            {% endif %}
-                        </div>
+{#                        <div class="coupon-section">#}
+{#                            <h4>کد تخفیف</h4>#}
+{#                            <form class="coupon-form" onsubmit="applyCoupon(event)">#}
+{#                                <div class="coupon-input">#}
+{#                                    <input type="text" name="coupon_code" placeholder="کد تخفیف را وارد کنید" id="couponCode">#}
+{#                                    <button type="submit">اعمال</button>#}
+{#                                </div>#}
+{#                            </form>#}
+{#                            {% if applied_coupon %}#}
+{#                            <div class="applied-coupon">#}
+{#                                <span class="coupon-info">#}
+{#                                    <i class="fas fa-check-circle"></i>#}
+{#                                    کد تخفیف "{{ applied_coupon.code }}" اعمال شد#}
+{#                                </span>#}
+{#                                <button class="remove-coupon" onclick="removeCoupon()">#}
+{#                                    <i class="fas fa-times"></i>#}
+{#                                </button>#}
+{#                            </div>#}
+{#                            {% endif %}#}
+{#                        </div>#}
 
                         <!-- Shipping Info -->
                         <div class="shipping-info">
