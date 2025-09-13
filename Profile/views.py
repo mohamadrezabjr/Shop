@@ -63,6 +63,13 @@ def order_cancel(request, token):
     this_order = get_object_or_404(Order,token=token)
     if this_order.user != request.user:
         raise Http404
+    carts = this_order.products.all()
+    for cart in carts:
+        product = cart.product
+        quantity = cart.num
+        product.stock += quantity
+        product.save()
+
     this_order.status = 'cancelled'
     this_order.save()
     return redirect('order_detail', token=token)
